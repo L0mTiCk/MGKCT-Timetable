@@ -10,11 +10,28 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.room.Room
+import com.l0mtick.mgkcttimetable.data.database.AppDatabase
+import com.l0mtick.mgkcttimetable.data.remote.parseAndSave
 import com.l0mtick.mgkcttimetable.ui.theme.MGKCTTimetableTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+    companion object {
+        lateinit var database: AppDatabase
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        database = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "my-database")
+            .build()
+        GlobalScope.launch(Dispatchers.Main) {
+            parseAndSave()
+        }
+//        CoroutineScope(Dispatchers.IO).launch {
+//            database.clearAllTables()
+//        }
         setContent {
             MGKCTTimetableTheme {
                 // A surface container using the 'background' color from the theme
