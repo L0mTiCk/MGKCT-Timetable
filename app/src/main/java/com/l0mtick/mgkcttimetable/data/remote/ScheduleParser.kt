@@ -10,7 +10,7 @@ import org.jsoup.select.Elements
 private const val TIMETABLE_TAG = "timetable_parser"
 private const val MGKCT_URL = "https://mgkct.minskedu.gov.by/%D0%BF%D0%B5%D1%80%D1%81%D0%BE%D0%BD%D0%B0%D0%BB%D0%B8%D0%B8/%D1%83%D1%87%D0%B0%D1%89%D0%B8%D0%BC%D1%81%D1%8F/%D1%80%D0%B0%D1%81%D0%BF%D0%B8%D1%81%D0%B0%D0%BD%D0%B8%D0%B5-%D0%B7%D0%B0%D0%BD%D1%8F%D1%82%D0%B8%D0%B9-%D0%BD%D0%B0-%D0%BD%D0%B5%D0%B4%D0%B5%D0%BB%D1%8E"
 
-suspend fun parseAndSave() {
+suspend fun parseRawTimetable(): MutableMap<String, List<Map<Int, List<String>>>>?{
     Log.d("timetable_parser", "parse started")
     val doc = withContext(Dispatchers.IO) {
         try {
@@ -21,12 +21,14 @@ suspend fun parseAndSave() {
             null
         }
     }
-    if (doc != null) {
-        parseAndSaveTimetable(doc)
+    return if (doc != null) {
+        mapTimetable(doc)
+    } else {
+        null
     }
 }
 
-fun parseAndSaveTimetable(doc: Document): MutableMap<String, List<Map<Int, List<String>>>> {
+fun mapTimetable(doc: Document): MutableMap<String, List<Map<Int, List<String>>>> {
     Log.d("timetable_parser", "parse and save")
 
     val allGroups: Elements = doc.select("tbody")

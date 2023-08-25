@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.l0mtick.mgkcttimetable"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -85,4 +85,7 @@ dependencies {
     implementation("androidx.room:room-runtime:$room_version")
     kapt("androidx.room:room-compiler:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
+
+    //gson
+    implementation("com.google.code.gson:gson:2.10.1")
 }

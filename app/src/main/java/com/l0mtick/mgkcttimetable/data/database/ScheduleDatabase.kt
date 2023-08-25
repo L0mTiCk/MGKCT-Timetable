@@ -4,10 +4,12 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 
-@Database(entities = [ScheduleEntity::class], version = 1)
+@Database(entities = [ScheduleEntity::class], version = 2)
+@TypeConverters(ScheduleConverter::class)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun timetableDao(): ScheduleDao
+    abstract fun scheduleDao(): ScheduleDao
     companion object {
         @Volatile
         private var INSTANCE: AppDatabase? = null

@@ -7,7 +7,5 @@ import androidx.room.PrimaryKey
 data class ScheduleEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val groupName: String,
-    val day: String,
-    val lesson: String,
-    val auditorium: String
+    val schedule: List<Map<Int, List<String>>>
 )
