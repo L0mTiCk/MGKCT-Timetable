@@ -20,6 +20,9 @@ import com.l0mtick.mgkcttimetable.presentation.ScheduleEvent
 import com.l0mtick.mgkcttimetable.presentation.ScheduleScreenViewModel
 import com.l0mtick.mgkcttimetable.presentation.StudentScheduleScreen
 import com.l0mtick.mgkcttimetable.ui.theme.MGKCTTimetableTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     companion object {
@@ -32,6 +35,7 @@ class MainActivity : ComponentActivity() {
             .build()
         val sharedPreferences = getSharedPreferences("MGKCT-Timetable", Context.MODE_PRIVATE)
         val scheduleRepository: ScheduleRepository = ScheduleRepositoryImpl(sharedPreferences, database.scheduleDao())
+        scheduleRepository.saveGroup("63")
 //        CoroutineScope(Dispatchers.IO).launch {
 //            database.clearAllTables()
 //        }
@@ -39,20 +43,11 @@ class MainActivity : ComponentActivity() {
         viewModel.onEvent(ScheduleEvent.OnFirstLoad)
         setContent {
             MGKCTTimetableTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val state = viewModel.state.collectAsState()
-//                    Greeting("Android")
-//                    Column {
-//                        Button(onClick = {
-//                            Log.d("timetableTest", "${scheduleRepository.getSavedGroup()}")
-//                        }) {
-//
-//                        }
-//                    }
                     StudentScheduleScreen(state = state.value, onEvent = viewModel::onEvent)
                 }
             }

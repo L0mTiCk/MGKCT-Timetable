@@ -9,6 +9,6 @@ data class ScheduleState (
     val groupSchedule: List<Map<Int, List<String>>> = emptyList(),
     val isScheduleUpdating: Boolean = true,
     val isSelectedDayOpen: Boolean = false,
-    val selectedDay: Int = 0,
+    val selectedDay: Int = currentDayOfWeek!!.value,
     val selectedGroup: String = ""
 )

@@ -31,7 +31,11 @@ class ScheduleScreenViewModel(private val scheduleRepository: ScheduleRepository
                 viewModelScope.launch {
                     _state.update {
                         it.copy(
-                            selectedDay = event.id,
+                            selectedDay = if (event.id != _state.value.selectedDay) {
+                                event.id
+                            } else {
+                                   -1
+                            },
                             isSelectedDayOpen = true
                         )
                     }
@@ -48,10 +52,14 @@ class ScheduleScreenViewModel(private val scheduleRepository: ScheduleRepository
                     }
                     _state.update {
                         it.copy(
-                            groupSchedule = scheduleRepository.getDbGroupTimetable() ?: emptyList()
+                            groupSchedule = scheduleRepository.getDbGroupTimetable() ?: emptyList(),
+                            selectedGroup = scheduleRepository.getSavedGroup() ?: "",
+                            isScheduleUpdating = false
                         )
                     }
                     Log.d("timetableTest", "${_state.value.groupSchedule}")
+                    Log.d("timetableTest", "${_state.value.currentDayOfWeek}")
+                    Log.d("timetableTest", "${_state.value.selectedDay}")
                 }
             }
         }
