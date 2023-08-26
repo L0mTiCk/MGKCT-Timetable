@@ -26,16 +26,6 @@ fun StudentScheduleScreen(
     onEvent: (ScheduleEvent) -> Unit
 ) {
     Scaffold(
-//        topBar = {
-//                 TopAppBar(
-//                     title = {
-//                         Text(
-//                             text = state.selectedGroup
-//                         )
-//                     },
-//                     scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-//                 )
-//        },
         bottomBar = {
 
         }
@@ -49,18 +39,15 @@ fun StudentScheduleScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = it
             ) {
-//                if (!state.isScheduleUpdating) {
-                    val temp = state.groupSchedule
                     val groupLessons = state.groupSchedule.get(0)
                     val groupAuditory = state.groupSchedule.get(1)
                     val groupLessonNumbers = state.groupSchedule.get(2)
-
 
                     stickyHeader {
                         TopAppBar(
                             title = {
                                 Text(
-                                    text = state.selectedGroup
+                                    text = "${state.selectedGroup} --- ${state.currentHour}"
                                 )
                             },
                             actions = {
@@ -86,6 +73,5 @@ fun StudentScheduleScreen(
                     }
                 }
             }
-        //}
     }
 }

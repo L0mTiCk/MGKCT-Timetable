@@ -1,7 +1,10 @@
 package com.l0mtick.mgkcttimetable.presentation.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.l0mtick.mgkcttimetable.presentation.ScheduleEvent
@@ -33,6 +37,15 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScheduleDayCard(day: Int, lessons:  List<String>, auditory: List<String>, lessonNumbers: List<String>, state: ScheduleState, onEvent: (ScheduleEvent) -> Unit) {
+
+    val currentLessonNumber = when (state.currentHour) {
+        in 7..10 -> 1
+        in 11..12 -> 2
+        in 13..14 -> 3
+        in 15..16 -> 4
+        in 17..19 -> 5
+        else -> 0
+    }
 
     val rotationAngle by animateFloatAsState(
         targetValue = if (state.selectedDay == day + 1) 0f else 180f,
@@ -83,10 +96,23 @@ fun ScheduleDayCard(day: Int, lessons:  List<String>, auditory: List<String>, le
         AnimatedVisibility(visible = state.selectedDay == day + 1) {
             Column {
                 lessons.forEachIndexed { index, s ->
+                    val backgroundColor by animateColorAsState(
+                        targetValue = if (index + 1 == currentLessonNumber && state.selectedDay == day + 1) {
+                            MaterialTheme.colorScheme.tertiaryContainer
+                        } else {
+                            Color.Transparent
+                        }, label = "Backcolor animation for current lesson",
+                        animationSpec = tween(durationMillis = 700)
+                    )
                     Row(
                         modifier = Modifier
+                            .background(
+                                color = backgroundColor,
+                                shape = RoundedCornerShape(20.dp)
+                            )
                             .padding(horizontal = 20.dp, vertical = 10.dp)
-                            .fillMaxWidth(),
+                            .fillMaxWidth()
+                            ,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
