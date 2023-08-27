@@ -8,15 +8,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.twotone.Refresh
 import androidx.compose.material.icons.twotone.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.l0mtick.mgkcttimetable.presentation.components.BottomNavigation
 import com.l0mtick.mgkcttimetable.presentation.components.ScheduleDayCard
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -27,7 +31,7 @@ fun StudentScheduleScreen(
 ) {
     Scaffold(
         bottomBar = {
-
+            BottomNavigation(onEvent = onEvent)
         }
     ) {
         AnimatedVisibility(
@@ -47,10 +51,16 @@ fun StudentScheduleScreen(
                         TopAppBar(
                             title = {
                                 Text(
-                                    text = "${state.selectedGroup} --- ${state.currentHour}"
+                                    text = "${state.selectedGroup}"
                                 )
                             },
                             actions = {
+                                IconButton(onClick = { /*TODO*/ }) {
+                                    Icon(
+                                        imageVector = Icons.TwoTone.Refresh,
+                                        contentDescription = "Refresh"
+                                    )
+                                }
                                 IconButton(onClick = { /*TODO*/ }) {
                                     Icon(
                                         imageVector = Icons.TwoTone.Settings,

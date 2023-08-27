@@ -38,7 +38,6 @@ class ScheduleScreenViewModel(private val scheduleRepository: ScheduleRepository
                             } else {
                                    -1
                             },
-                            isSelectedDayOpen = true
                         )
                     }
                 }

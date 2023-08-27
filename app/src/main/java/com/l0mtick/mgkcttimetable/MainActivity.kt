@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.room.Room
 import com.l0mtick.mgkcttimetable.data.database.AppDatabase
 import com.l0mtick.mgkcttimetable.data.repository.ScheduleRepositoryImpl
@@ -28,6 +29,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        actionBar?.hide()
         database = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "my-database")
             .fallbackToDestructiveMigration()
             .build()

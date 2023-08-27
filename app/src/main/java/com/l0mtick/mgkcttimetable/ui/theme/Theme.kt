@@ -4,10 +4,12 @@ import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.toArgb
@@ -98,10 +100,15 @@ fun MGKCTTimetableTheme(
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = colors.surface.toArgb()
+            window.navigationBarColor = colors.surfaceColorAtElevation(NavigationBarDefaults.Elevation).toArgb()
             WindowCompat.getInsetsController(
                 window,
                 view
             ).isAppearanceLightStatusBars = !useDarkTheme
+            WindowCompat.getInsetsController(
+                window,
+                view
+            ).isAppearanceLightNavigationBars = !useDarkTheme
         }
     }
     MaterialTheme(

@@ -1,5 +1,6 @@
 package com.l0mtick.mgkcttimetable.presentation.components
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -25,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.l0mtick.mgkcttimetable.presentation.ScheduleEvent
@@ -48,7 +50,7 @@ fun ScheduleDayCard(day: Int, lessons:  List<String>, auditory: List<String>, le
     }
 
     val rotationAngle by animateFloatAsState(
-        targetValue = if (state.selectedDay == day + 1) 0f else 180f,
+        targetValue = if (state.selectedDay == day + 1) 180f else 0f,
         label = "Rotate arrow"
     )
 
@@ -97,7 +99,8 @@ fun ScheduleDayCard(day: Int, lessons:  List<String>, auditory: List<String>, le
             Column {
                 lessons.forEachIndexed { index, s ->
                     val backgroundColor by animateColorAsState(
-                        targetValue = if (index + 1 == currentLessonNumber && state.selectedDay == day + 1) {
+                        targetValue = if (lessonNumbers.get(index).toInt() == currentLessonNumber && state.currentDayOfWeek?.value == day + 1) {
+                            Log.d("timetableTest", "selected day - ${state.selectedDay}, card ${day + 1}")
                             MaterialTheme.colorScheme.tertiaryContainer
                         } else {
                             Color.Transparent
@@ -144,5 +147,5 @@ fun getDayOfWeekNameAndNumber(dayOfWeek: Int): String {
     val daysToAdd = dayOfWeek - currentDayOfWeek
     val date = currentDate.plusDays(daysToAdd.toLong())
     val dayNumber = date.dayOfMonth
-    return "${dayNumber + 1}. $dayName"
+    return "${dayNumber + 1}. ${dayName.replaceFirstChar { it.uppercase() }}"
 }
