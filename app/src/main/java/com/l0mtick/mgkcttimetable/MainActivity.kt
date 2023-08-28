@@ -9,17 +9,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
 import com.l0mtick.mgkcttimetable.data.database.AppDatabase
 import com.l0mtick.mgkcttimetable.data.repository.ScheduleRepositoryImpl
 import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
-import com.l0mtick.mgkcttimetable.presentation.ScheduleEvent
-import com.l0mtick.mgkcttimetable.presentation.ScheduleScreenViewModel
-import com.l0mtick.mgkcttimetable.presentation.StudentScheduleScreen
+import com.l0mtick.mgkcttimetable.presentation.schedule.StudentScheduleScreen
+import com.l0mtick.mgkcttimetable.presentation.settings.SettingsScreen
 import com.l0mtick.mgkcttimetable.ui.theme.MGKCTTimetableTheme
 
 class MainActivity : ComponentActivity() {
@@ -35,20 +35,26 @@ class MainActivity : ComponentActivity() {
             .build()
         val sharedPreferences = getSharedPreferences("MGKCT-Timetable", Context.MODE_PRIVATE)
         val scheduleRepository: ScheduleRepository = ScheduleRepositoryImpl(sharedPreferences, database.scheduleDao())
-        scheduleRepository.saveGroup("67")
+        scheduleRepository.saveGroup("63")
 //        CoroutineScope(Dispatchers.IO).launch {
 //            database.clearAllTables()
 //        }
-        val viewModel by lazy {  ScheduleScreenViewModel(scheduleRepository) }
-        viewModel.onEvent(ScheduleEvent.OnFirstLoad)
         setContent {
             MGKCTTimetableTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val state = viewModel.state.collectAsState()
-                    StudentScheduleScreen(state = state.value, onEvent = viewModel::onEvent)
+                    val navController = rememberNavController()
+                    NavHost(navController = navController, startDestination = "group") {
+                        composable("group") {
+                            StudentScheduleScreen(scheduleRepository = scheduleRepository, navController = navController)
+                        }
+
+                        composable("settings") {
+                            SettingsScreen(repository = scheduleRepository, navController = navController)
+                        }
+                    }
                 }
             }
         }

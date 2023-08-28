@@ -1,4 +1,4 @@
-package com.l0mtick.mgkcttimetable.presentation
+package com.l0mtick.mgkcttimetable.presentation.schedule
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -13,9 +13,11 @@ import java.time.LocalDateTime
 
 class ScheduleScreenViewModel(private val scheduleRepository: ScheduleRepository): ViewModel() {
 
-    private val _state = MutableStateFlow(ScheduleState(
+    private val _state = MutableStateFlow(
+        ScheduleState(
         selectedGroup = "63"
-    ))
+    )
+    )
     val state = _state.asStateFlow()
     fun onEvent(event: ScheduleEvent) {
         when (event) {

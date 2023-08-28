@@ -1,4 +1,4 @@
-package com.l0mtick.mgkcttimetable.presentation.components
+package com.l0mtick.mgkcttimetable.presentation.schedule.components
 
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
@@ -26,11 +26,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.l0mtick.mgkcttimetable.presentation.ScheduleEvent
-import com.l0mtick.mgkcttimetable.presentation.ScheduleState
+import com.l0mtick.mgkcttimetable.presentation.schedule.ScheduleEvent
+import com.l0mtick.mgkcttimetable.presentation.schedule.ScheduleState
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.TextStyle

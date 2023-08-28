@@ -1,8 +1,7 @@
-package com.l0mtick.mgkcttimetable.presentation
+package com.l0mtick.mgkcttimetable.presentation.schedule
 
 import java.time.DayOfWeek
 import java.time.LocalDateTime
-
 
 data class ScheduleState (
     val currentDayOfWeek: DayOfWeek? = LocalDateTime.now().dayOfWeek,

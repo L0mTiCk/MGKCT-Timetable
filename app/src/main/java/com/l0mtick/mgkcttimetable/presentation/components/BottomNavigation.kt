@@ -15,7 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.l0mtick.mgkcttimetable.presentation.ScheduleEvent
+import androidx.navigation.NavController
 
 data class NavigationItem(
     val title: String,
@@ -23,7 +23,7 @@ data class NavigationItem(
     val unselectedIcon: ImageVector,
     )
 @Composable
-fun BottomNavigation(onEvent: (ScheduleEvent) -> Unit) {
+fun BottomNavigation(navController: NavController) {
     var selectedItemIndex by rememberSaveable {
         mutableIntStateOf(0)
     }
@@ -45,7 +45,7 @@ fun BottomNavigation(onEvent: (ScheduleEvent) -> Unit) {
                 selected = index == selectedItemIndex,
                 onClick = {
                     selectedItemIndex = index
-                    //TODO: navigation to teacher schedule screen
+
                 },
                 label = {
                     Text(text = item.title)

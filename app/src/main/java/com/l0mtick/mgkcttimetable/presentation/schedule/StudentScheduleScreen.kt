@@ -1,4 +1,4 @@
-package com.l0mtick.mgkcttimetable.presentation
+package com.l0mtick.mgkcttimetable.presentation.schedule
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeOut
@@ -13,25 +13,32 @@ import androidx.compose.material.icons.twotone.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
 import com.l0mtick.mgkcttimetable.presentation.components.BottomNavigation
-import com.l0mtick.mgkcttimetable.presentation.components.ScheduleDayCard
+import com.l0mtick.mgkcttimetable.presentation.schedule.components.ScheduleDayCard
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun StudentScheduleScreen(
-    state: ScheduleState,
-    onEvent: (ScheduleEvent) -> Unit
+    scheduleRepository: ScheduleRepository,
+    navController: NavController
 ) {
+    val scheduleScreenViewModelFactory = ScheduleScreenViewModelFactory(scheduleRepository = scheduleRepository)
+    val scheduleScreenViewModel: ScheduleScreenViewModel = viewModel(factory = scheduleScreenViewModelFactory)
+    val state = scheduleScreenViewModel.state.collectAsState().value
+    val onEvent = scheduleScreenViewModel::onEvent
+    scheduleScreenViewModel.onEvent(ScheduleEvent.OnFirstLoad)
     Scaffold(
         bottomBar = {
-            BottomNavigation(onEvent = onEvent)
+            BottomNavigation(navController = navController)
         }
     ) {
         AnimatedVisibility(
@@ -61,7 +68,9 @@ fun StudentScheduleScreen(
                                         contentDescription = "Refresh"
                                     )
                                 }
-                                IconButton(onClick = { /*TODO*/ }) {
+                                IconButton(onClick = {
+                                    navController.navigate("settings")
+                                }) {
                                     Icon(
                                         imageVector = Icons.TwoTone.Settings,
                                         contentDescription = "Settings"
