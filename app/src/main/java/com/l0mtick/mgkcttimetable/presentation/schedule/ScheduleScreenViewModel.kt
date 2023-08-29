@@ -21,16 +21,6 @@ class ScheduleScreenViewModel(private val scheduleRepository: ScheduleRepository
     val state = _state.asStateFlow()
     fun onEvent(event: ScheduleEvent) {
         when (event) {
-            is ScheduleEvent.OnNewLessonsParsed -> {
-                viewModelScope.launch {
-                    _state.update {
-                        it.copy(
-                            isScheduleUpdating = false
-                        )
-                    }
-                }
-            }
-
             is ScheduleEvent.OnSpecificDayClick -> {
                 viewModelScope.launch {
                     _state.update {
@@ -38,7 +28,7 @@ class ScheduleScreenViewModel(private val scheduleRepository: ScheduleRepository
                             selectedDay = if (event.id != _state.value.selectedDay) {
                                 event.id
                             } else {
-                                   -1
+                                -1
                             },
                         )
                     }
@@ -46,8 +36,9 @@ class ScheduleScreenViewModel(private val scheduleRepository: ScheduleRepository
             }
 
             //TODO: check internet or time, or is local db exist
-            ScheduleEvent.OnFirstLoad -> {
+            ScheduleEvent.UpdateSchedule -> {
                 viewModelScope.launch {
+                    onEvent(ScheduleEvent.OnUpdatingStart)
                     try {
                         scheduleRepository.parseTimetable()
                     } catch (e: Exception) {
@@ -55,20 +46,37 @@ class ScheduleScreenViewModel(private val scheduleRepository: ScheduleRepository
                     }
                     _state.update {
                         it.copy(
-                            groupSchedule = scheduleRepository.getDbGroupTimetable() ?: emptyList(),
+                            groupSchedule = scheduleRepository.getDbGroupTimetable() ?: listOf(emptyMap(), emptyMap(), emptyMap()),
                             selectedGroup = scheduleRepository.getSavedGroup() ?: "",
                             isScheduleUpdating = false
                         )
                     }
+                    onEvent(ScheduleEvent.OnUpdatingFinished)
                     Log.d("timetableTest", "${_state.value.groupSchedule}")
                     Log.d("timetableTest", "${_state.value.currentDayOfWeek}")
                     Log.d("timetableTest", "${_state.value.selectedDay}")
+                }
+            }
+
+            ScheduleEvent.OnUpdatingFinished -> {
+                viewModelScope.launch {
+                    _state.update {
+                        it.copy(isScheduleUpdating = false)
+                    }
+                }
+            }
+            ScheduleEvent.OnUpdatingStart -> {
+                viewModelScope.launch {
+                    _state.update {
+                        it.copy(isScheduleUpdating = true)
+                    }
                 }
             }
         }
     }
 
     init {
+        onEvent(ScheduleEvent.UpdateSchedule)
         viewModelScope.launch {
             var currentHour = LocalDateTime.now().hour
             var delay = 1000 * 60 * 60 - (LocalDateTime.now().minute) * 60 * 1000L

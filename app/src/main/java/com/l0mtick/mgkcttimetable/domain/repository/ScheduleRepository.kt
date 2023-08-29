@@ -10,4 +10,6 @@ interface ScheduleRepository {
     fun saveGroup(group: String)
 
     fun getSavedGroup(): String?
+
+    suspend fun getAllGroupNames(): List<String>?
 }

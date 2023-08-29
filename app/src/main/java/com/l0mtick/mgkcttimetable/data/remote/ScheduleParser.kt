@@ -16,7 +16,7 @@ suspend fun parseRawTimetable(): MutableMap<String, List<Map<Int, List<String>>>
         try {
             Jsoup.connect(MGKCT_URL).get()
         } catch (e: Exception) {
-            Log.d("timetable_parser", "parse failed")
+            Log.d("timetable_parser", "parse failed, message - ${e.message}")
             e.printStackTrace()
             null
         }

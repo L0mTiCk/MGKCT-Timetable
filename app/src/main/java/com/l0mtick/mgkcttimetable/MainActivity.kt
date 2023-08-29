@@ -35,7 +35,7 @@ class MainActivity : ComponentActivity() {
             .build()
         val sharedPreferences = getSharedPreferences("MGKCT-Timetable", Context.MODE_PRIVATE)
         val scheduleRepository: ScheduleRepository = ScheduleRepositoryImpl(sharedPreferences, database.scheduleDao())
-        scheduleRepository.saveGroup("63")
+//        scheduleRepository.saveGroup("66")
 //        CoroutineScope(Dispatchers.IO).launch {
 //            database.clearAllTables()
 //        }

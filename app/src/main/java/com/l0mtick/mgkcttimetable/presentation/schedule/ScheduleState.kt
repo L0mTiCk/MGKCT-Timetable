@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 
 data class ScheduleState (
     val currentDayOfWeek: DayOfWeek? = LocalDateTime.now().dayOfWeek,
-    val groupSchedule: List<Map<Int, List<String>>> = emptyList(),
+    val groupSchedule: List<Map<Int, List<String>>> = listOf(emptyMap(), emptyMap(), emptyMap()),
     val isScheduleUpdating: Boolean = true,
     val selectedDay: Int = currentDayOfWeek!!.value,
     val selectedGroup: String = "",

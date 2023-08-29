@@ -29,17 +29,33 @@ class ScheduleRepositoryImpl(
 
     override suspend fun saveTimetableToDb(schedule: MutableMap<String, List<Map<Int, List<String>>>>) {
         for (key in schedule.keys) {
-            val entity = schedule[key]?.let { ScheduleEntity(groupName = key, schedule = it) }
-            if (entity?.schedule != null)
-                scheduleDao.insertSchedule(entity)
+            val existingScheduleEntity = scheduleDao.getScheduleForGroup(key)
+            if (existingScheduleEntity != null) {
+                // Update the existing entity
+                existingScheduleEntity.schedule = schedule[key]!!
+                scheduleDao.updateSchedule(existingScheduleEntity)
+            } else {
+                // Insert a new entity
+                val newScheduleEntity = ScheduleEntity(groupName = key, schedule = schedule[key]!!)
+                scheduleDao.insertSchedule(newScheduleEntity)
+            }
         }
     }
 
     override fun saveGroup(group: String) {
-        sharedPreferences.edit().putString(SAVE_GROUP, "Группа - $group").apply()
+        when (group.length) {
+            in 1..6 -> sharedPreferences.edit().putString(SAVE_GROUP, "Группа - $group").apply()
+            else -> sharedPreferences.edit().putString(SAVE_GROUP, group).apply()
+        }
     }
 
     override fun getSavedGroup(): String? {
         return sharedPreferences.getString(SAVE_GROUP, null)
     }
+
+    override suspend fun getAllGroupNames(): List<String>? {
+        return scheduleDao.getAllGroupNames()
+    }
+
+
 }

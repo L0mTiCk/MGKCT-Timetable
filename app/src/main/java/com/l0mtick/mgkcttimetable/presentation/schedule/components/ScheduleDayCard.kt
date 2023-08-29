@@ -143,8 +143,8 @@ fun getDayOfWeekNameAndNumber(dayOfWeek: Int): String {
     val dayName = day.getDisplayName(TextStyle.FULL, Locale.getDefault())
     val currentDate = LocalDate.now()
     val currentDayOfWeek = currentDate.dayOfWeek.value
-    val daysToAdd = dayOfWeek - currentDayOfWeek
+    val daysToAdd = dayOfWeek + 1 - currentDayOfWeek
     val date = currentDate.plusDays(daysToAdd.toLong())
     val dayNumber = date.dayOfMonth
-    return "${dayNumber + 1}. ${dayName.replaceFirstChar { it.uppercase() }}"
+    return "${dayNumber}. ${dayName.replaceFirstChar { it.uppercase() }}"
 }
