@@ -30,6 +30,25 @@ class SettingsScreenViewModel(private val scheduleRepository: ScheduleRepository
                     scheduleRepository.saveGroup(event.groupName)
                 }
             }
+
+            SettingsEvent.OnAppInfoClick -> {
+                viewModelScope.launch {
+                    _state.update {
+                        it.copy(
+                            isAppInfoDialogOpen = true
+                        )
+                    }
+                }
+            }
+            SettingsEvent.OnDialogDismiss -> {
+                viewModelScope.launch {
+                    _state.update {
+                        it.copy(
+                            isAppInfoDialogOpen = false
+                        )
+                    }
+                }
+            }
         }
     }
 
