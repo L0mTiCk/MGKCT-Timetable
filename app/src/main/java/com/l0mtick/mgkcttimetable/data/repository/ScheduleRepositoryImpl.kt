@@ -5,6 +5,9 @@ import com.l0mtick.mgkcttimetable.data.database.ScheduleDao
 import com.l0mtick.mgkcttimetable.data.database.ScheduleEntity
 import com.l0mtick.mgkcttimetable.data.remote.parseRawTimetable
 import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 private const val SAVE_GROUP = "saved_group"
 private const val SAVE_TEACHER = "saved_teacher"
@@ -17,7 +20,9 @@ class ScheduleRepositoryImpl(
     override suspend fun parseTimetable(): MutableMap<String, List<Map<Int, List<String>>>>? {
         val schedule = parseRawTimetable()
         if (schedule != null)
-            saveTimetableToDb(schedule)
+            CoroutineScope(Dispatchers.IO).launch {
+                saveTimetableToDb(schedule)
+            }
         return schedule
     }
     

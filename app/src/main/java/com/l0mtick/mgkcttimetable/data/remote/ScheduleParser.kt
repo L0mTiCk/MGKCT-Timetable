@@ -70,7 +70,6 @@ fun mapTimetable(doc: Document): MutableMap<String, List<Map<Int, List<String>>>
             }
 
             for (dayCounter in 0 until weekDays.size * 2 step 2) {
-                val dayName = weekDays[dayCounter / 2].text()
                 val lessonsList = mutableListOf<String>()
                 val auditoriumList = mutableListOf<String>()
                 val lessonNumberList = mutableListOf<String>()
@@ -82,10 +81,10 @@ fun mapTimetable(doc: Document): MutableMap<String, List<Map<Int, List<String>>>
                         lessonsList.add(lesson)
                         auditoriumList.add(auditorium)
                         lessonNumberList.add("${j + 1}")
-                        Log.d(
-                            "timetable_parser",
-                            "group - $groupName, day - $dayName, lesson number - ${j + 1}, lesson - $lesson, auditory - $auditorium"
-                        )
+//                        Log.d(
+//                            "timetable_parser",
+//                            "group - $groupName, day - $dayName, lesson number - ${j + 1}, lesson - $lesson, auditory - $auditorium"
+//                        )
                     }
                 }
                 if (lessonsList.isNotEmpty()) {
@@ -98,10 +97,12 @@ fun mapTimetable(doc: Document): MutableMap<String, List<Map<Int, List<String>>>
         listOfMap.add(lessonMap)
         listOfMap.add(auditoriumMap)
         listOfMap.add(lessonNumberMap)
-        Log.d("timetableTest", "$lessonNumberMap")
+//        Log.d("timetableTest", "$lessonNumberMap")
         groupLessonsMap.put(key = groupName, value = listOfMap)
     }
-    Log.d(TIMETABLE_TAG, "$groupLessonsMap")
-    Log.d(TIMETABLE_TAG, "${groupLessonsMap.get("Преподаватель - Липень А. В.")}")
+//    Log.d(TIMETABLE_TAG, "$groupLessonsMap")
+//    Log.d(TIMETABLE_TAG, "${groupLessonsMap.get("Преподаватель - Липень А. В.")}")
+    Log.d("timetable_parser", "finished")
+
     return groupLessonsMap
 }
