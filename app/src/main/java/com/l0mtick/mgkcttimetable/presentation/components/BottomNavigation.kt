@@ -23,9 +23,9 @@ data class NavigationItem(
     val unselectedIcon: ImageVector,
     )
 @Composable
-fun BottomNavigation(navController: NavController) {
+fun BottomNavigation(navController: NavController, currentScreenId: Int) {
     var selectedItemIndex by rememberSaveable {
-        mutableIntStateOf(0)
+        mutableIntStateOf(currentScreenId - 1)
     }
     val navItems = listOf(
         NavigationItem(
@@ -45,7 +45,17 @@ fun BottomNavigation(navController: NavController) {
                 selected = index == selectedItemIndex,
                 onClick = {
                     selectedItemIndex = index
-
+                    when(currentScreenId) {
+                        1 -> {
+                            if (selectedItemIndex == 1)
+                                navController.navigate("teacher")
+                            selectedItemIndex -= 1
+                        }
+                        2 -> {
+                            if (selectedItemIndex == 0)
+                                navController.popBackStack()
+                        }
+                    }
                 },
                 label = {
                     Text(text = item.title)

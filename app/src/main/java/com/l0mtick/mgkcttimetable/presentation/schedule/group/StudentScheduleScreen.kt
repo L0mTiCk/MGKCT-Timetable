@@ -1,4 +1,4 @@
-package com.l0mtick.mgkcttimetable.presentation.schedule
+package com.l0mtick.mgkcttimetable.presentation.schedule.group
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -31,7 +31,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
 import com.l0mtick.mgkcttimetable.presentation.components.BottomNavigation
-import com.l0mtick.mgkcttimetable.presentation.schedule.components.ScheduleDayCard
+import com.l0mtick.mgkcttimetable.presentation.components.ScheduleDayCard
+import com.l0mtick.mgkcttimetable.presentation.schedule.ScheduleEvent
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -39,16 +40,16 @@ fun StudentScheduleScreen(
     scheduleRepository: ScheduleRepository,
     navController: NavController
 ) {
-    val scheduleScreenViewModelFactory =
-        ScheduleScreenViewModelFactory(scheduleRepository = scheduleRepository)
-    val scheduleScreenViewModel: ScheduleScreenViewModel =
-        viewModel(factory = scheduleScreenViewModelFactory)
-    val state = scheduleScreenViewModel.state.collectAsState().value
-    val onEvent = scheduleScreenViewModel::onEvent
+    val groupScheduleScreenViewModelFactory =
+        GroupScheduleScreenViewModelFactory(scheduleRepository = scheduleRepository)
+    val groupScheduleScreenViewModel: GroupScheduleScreenViewModel =
+        viewModel(factory = groupScheduleScreenViewModelFactory)
+    val state = groupScheduleScreenViewModel.state.collectAsState().value
+    val onEvent = groupScheduleScreenViewModel::onEvent
 
     Scaffold(
         bottomBar = {
-            BottomNavigation(navController = navController)
+            BottomNavigation(navController = navController, currentScreenId = 1)
         }
     ) {
         Box(

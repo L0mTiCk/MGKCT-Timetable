@@ -1,4 +1,4 @@
-package com.l0mtick.mgkcttimetable.presentation.schedule.components
+package com.l0mtick.mgkcttimetable.presentation.components
 
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
@@ -120,7 +120,7 @@ fun ScheduleDayCard(day: Int, lessons:  List<String>, auditory: List<String>, le
                         Text(
                             text = "${lessonNumbers.get(index)}.",
                             modifier = Modifier
-                                .padding(end = 10.dp, bottom = 20.dp),
+                                .padding(end = 10.dp),
                             fontSize = 17.sp
                         )
                         Text(

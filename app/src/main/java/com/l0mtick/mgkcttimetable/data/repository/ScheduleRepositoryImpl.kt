@@ -7,6 +7,8 @@ import com.l0mtick.mgkcttimetable.data.remote.parseRawTimetable
 import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
 
 private const val SAVE_GROUP = "saved_group"
+private const val SAVE_TEACHER = "saved_teacher"
+
 
 class ScheduleRepositoryImpl(
     private val sharedPreferences: SharedPreferences,
@@ -19,12 +21,24 @@ class ScheduleRepositoryImpl(
         return schedule
     }
     
-    override suspend fun getDbGroupTimetable(): List<Map<Int, List<String>>>? {
+    override suspend fun getDbGroupTimetable(mode: Int): List<Map<Int, List<String>>>? {
         val groupName = getSavedGroup()
-        return if (groupName != null)
-            scheduleDao.getScheduleForGroup(groupName)?.schedule
-        else
-            null
+        val teacherName = getSavedTeacher()
+        when(mode) {
+            0 -> {
+                return if (groupName != null)
+                    scheduleDao.getScheduleForGroup(groupName)?.schedule
+                else
+                    null
+            }
+            1 -> {
+                return if (teacherName != null)
+                    scheduleDao.getScheduleForGroup(teacherName)?.schedule
+                else
+                    null
+            }
+            else -> return null
+        }
     }
 
     override suspend fun saveTimetableToDb(schedule: MutableMap<String, List<Map<Int, List<String>>>>) {
@@ -53,9 +67,19 @@ class ScheduleRepositoryImpl(
         return sharedPreferences.getString(SAVE_GROUP, null)
     }
 
-    override suspend fun getAllGroupNames(): List<String>? {
-        return scheduleDao.getAllGroupNames()
+    override fun saveTeacher(group: String) {
+        sharedPreferences.edit().putString(SAVE_TEACHER, group).apply()
     }
 
+    override fun getSavedTeacher(): String? {
+        return sharedPreferences.getString(SAVE_TEACHER, null)
+    }
 
+    override suspend fun getAllGroupNames(): List<String>? {
+        return scheduleDao.getAllNames()?.filter { it.contains("Группа") }
+    }
+
+    override suspend fun getAllTeacherNames(): List<String>? {
+        return scheduleDao.getAllNames()?.filter { it.contains("Преподаватель") }
+    }
 }

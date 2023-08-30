@@ -3,7 +3,7 @@ package com.l0mtick.mgkcttimetable.domain.repository
 interface ScheduleRepository {
     suspend fun parseTimetable(): MutableMap<String, List<Map<Int, List<String>>>>?
 
-    suspend fun getDbGroupTimetable(): List<Map<Int, List<String>>>?
+    suspend fun getDbGroupTimetable(mode: Int): List<Map<Int, List<String>>>?
 
     suspend fun saveTimetableToDb(schedule: MutableMap<String, List<Map<Int, List<String>>>>)
 
@@ -11,5 +11,13 @@ interface ScheduleRepository {
 
     fun getSavedGroup(): String?
 
+    fun saveTeacher(group: String)
+
+    fun getSavedTeacher(): String?
+
     suspend fun getAllGroupNames(): List<String>?
+
+    suspend fun getAllTeacherNames(): List<String>?
+
+
 }

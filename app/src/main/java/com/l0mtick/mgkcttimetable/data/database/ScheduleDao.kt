@@ -18,5 +18,5 @@ interface ScheduleDao {
     suspend fun getScheduleForGroup(groupName: String): ScheduleEntity?
 
     @Query("SELECT DISTINCT groupName FROM timetable")
-    suspend fun getAllGroupNames(): List<String>?
+    suspend fun getAllNames(): List<String>?
 }

@@ -69,7 +69,10 @@ fun SettingsScreen(
         }
     ) {
         val context = LocalContext.current
-        var isExpanded by remember {
+        var isGroupExpanded by remember {
+            mutableStateOf(false)
+        }
+        var isTeacherExpanded by remember {
             mutableStateOf(false)
         }
         Column(
@@ -78,9 +81,9 @@ fun SettingsScreen(
                 .fillMaxSize()
         ) {
             ExposedDropdownMenuBox(
-                expanded = isExpanded,
+                expanded = isGroupExpanded,
                 onExpandedChange = {
-                    isExpanded = it
+                    isGroupExpanded = it
                 },
                 modifier = Modifier
                     .padding(top = it.calculateTopPadding())
@@ -105,8 +108,8 @@ fun SettingsScreen(
                         .fillMaxWidth(),
                 )
                 ExposedDropdownMenu(
-                    expanded = isExpanded,
-                    onDismissRequest = { isExpanded = false }
+                    expanded = isGroupExpanded,
+                    onDismissRequest = { isGroupExpanded = false }
                 ) {
                     state.allGroups.forEach {
                         DropdownMenuItem(
@@ -114,8 +117,52 @@ fun SettingsScreen(
                                 Text(text = it)
                             },
                             onClick = {
-                                isExpanded = false
+                                isGroupExpanded = false
                                 onEvent(SettingsEvent.OnSpecificGroupClick(it))
+                            }
+                        )
+                    }
+                }
+            }
+            ExposedDropdownMenuBox(
+                expanded = isTeacherExpanded,
+                onExpandedChange = {
+                    isTeacherExpanded = it
+                },
+                modifier = Modifier
+                    .padding(top = 20.dp)
+                    .fillMaxWidth()
+            ) {
+                OutlinedTextField(
+                    label = {
+                        Text(text = "Teacher")
+                    },
+                    value = state.selectedTeacher,
+                    readOnly = true,
+                    enabled = false,
+                    onValueChange = {},
+                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(
+                        disabledBorderColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                        disabledPlaceholderColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                        disabledLabelColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                        disabledTextColor = MaterialTheme.colorScheme.onSecondaryContainer
+                    ),
+                    modifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth(),
+                )
+                ExposedDropdownMenu(
+                    expanded = isTeacherExpanded,
+                    onDismissRequest = { isTeacherExpanded = false }
+                ) {
+                    state.allTeachers.forEach {
+                        DropdownMenuItem(
+                            text = {
+                                Text(text = it)
+                            },
+                            onClick = {
+                                isTeacherExpanded = false
+                                onEvent(SettingsEvent.OnSpecificTeacherClick(it))
                             }
                         )
                     }

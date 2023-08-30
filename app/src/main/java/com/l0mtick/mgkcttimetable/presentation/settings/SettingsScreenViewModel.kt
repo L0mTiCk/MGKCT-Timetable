@@ -12,7 +12,8 @@ class SettingsScreenViewModel(private val scheduleRepository: ScheduleRepository
 
     private val _state = MutableStateFlow(
         SettingsState(
-            selectedGroup = scheduleRepository.getSavedGroup() ?: "63"
+            selectedGroup = scheduleRepository.getSavedGroup() ?: "",
+            selectedTeacher = scheduleRepository.getSavedTeacher() ?: ""
         )
     )
 
@@ -49,6 +50,17 @@ class SettingsScreenViewModel(private val scheduleRepository: ScheduleRepository
                     }
                 }
             }
+
+            is SettingsEvent.OnSpecificTeacherClick -> {
+                viewModelScope.launch {
+                    _state.update {
+                        it.copy(
+                            selectedTeacher = event.teacherName
+                        )
+                    }
+                    scheduleRepository.saveTeacher(event.teacherName)
+                }
+            }
         }
     }
 
@@ -56,7 +68,8 @@ class SettingsScreenViewModel(private val scheduleRepository: ScheduleRepository
         viewModelScope.launch {
             _state.update {
                 it.copy(
-                    allGroups = scheduleRepository.getAllGroupNames() ?: emptyList()
+                    allGroups = scheduleRepository.getAllGroupNames() ?: emptyList(),
+                    allTeachers = scheduleRepository.getAllTeacherNames() ?: emptyList()
                 )
             }
         }

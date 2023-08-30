@@ -1,9 +1,11 @@
-package com.l0mtick.mgkcttimetable.presentation.schedule
+package com.l0mtick.mgkcttimetable.presentation.schedule.teacher
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
+import com.l0mtick.mgkcttimetable.presentation.schedule.ScheduleEvent
+import com.l0mtick.mgkcttimetable.presentation.schedule.ScheduleState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,11 +13,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
-class ScheduleScreenViewModel(private val scheduleRepository: ScheduleRepository): ViewModel() {
+class TeacherScheduleScreenViewModel(private val scheduleRepository: ScheduleRepository): ViewModel() {
 
     private val _state = MutableStateFlow(
         ScheduleState(
-        selectedGroup = "63"
+        selectedGroup = "Преподаватель - Амброжи Н. М."
     )
     )
     val state = _state.asStateFlow()
@@ -35,19 +37,13 @@ class ScheduleScreenViewModel(private val scheduleRepository: ScheduleRepository
                 }
             }
 
-            //TODO: check internet or time, or is local db exist
             ScheduleEvent.UpdateSchedule -> {
                 viewModelScope.launch {
                     onEvent(ScheduleEvent.OnUpdatingStart)
-                    try {
-                        scheduleRepository.parseTimetable()
-                    } catch (e: Exception) {
-                        Log.d("timetableTest", "${e.message}")
-                    }
                     _state.update {
                         it.copy(
-                            groupSchedule = scheduleRepository.getDbGroupTimetable() ?: listOf(emptyMap(), emptyMap(), emptyMap()),
-                            selectedGroup = scheduleRepository.getSavedGroup() ?: "",
+                            groupSchedule = scheduleRepository.getDbGroupTimetable(1) ?: listOf(emptyMap(), emptyMap(), emptyMap()),
+                            selectedGroup = scheduleRepository.getSavedTeacher() ?: "Никто не выбран",
                             isScheduleUpdating = false
                         )
                     }
