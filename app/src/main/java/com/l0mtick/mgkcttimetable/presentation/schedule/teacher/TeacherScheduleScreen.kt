@@ -4,9 +4,10 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,11 +27,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
 import com.l0mtick.mgkcttimetable.presentation.components.BottomNavigation
+import com.l0mtick.mgkcttimetable.presentation.components.NoConnectionCard
 import com.l0mtick.mgkcttimetable.presentation.components.ScheduleDayCard
 import com.l0mtick.mgkcttimetable.presentation.schedule.ScheduleEvent
 
@@ -46,6 +49,13 @@ fun TeacherScheduleScreen(
         viewModel(factory = scheduleScreenViewModelFactory)
     val state = teacherScheduleScreenViewModel.state.collectAsState().value
     val onEvent = teacherScheduleScreenViewModel::onEvent
+    val context = LocalContext.current
+    scheduleRepository.getConnectionStatus(
+        context = context,
+        callback = {
+            onEvent(ScheduleEvent.OnNetworkChange(it))
+        }
+    )
 
     Scaffold(
         bottomBar = {
@@ -53,22 +63,27 @@ fun TeacherScheduleScreen(
         }
     ) {
         Box(
-            contentAlignment = Alignment.Center,
             modifier = Modifier.fillMaxSize()
         ) {
             AnimatedVisibility(
                 visible = state.isScheduleUpdating,
                 enter = fadeIn(animationSpec = tween(200))
             ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(40.dp),
-                    strokeWidth = 5.dp,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer,
-                )
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(40.dp),
+                        strokeWidth = 5.dp,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    )
+                }
             }
             AnimatedVisibility(
                 visible = !state.isScheduleUpdating,
-                enter = slideInHorizontally { it },
+                enter = fadeIn(),
                 exit = fadeOut()
             ) {
                 LazyColumn(
@@ -117,8 +132,23 @@ fun TeacherScheduleScreen(
                             onEvent = onEvent
                         )
                     }
+                    if (groupLessons.isEmpty()) {
+                        item {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center,
+                                modifier = Modifier.fillMaxSize(),
+                            ) {
+                                Text(
+                                    text = "Пар нет",
+                                    style = MaterialTheme.typography.titleLarge
+                                )
+                            }
+                        }
+                    }
                 }
             }
+            NoConnectionCard(isVisible = !state.isConnected)
         }
     }
 }

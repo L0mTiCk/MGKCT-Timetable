@@ -74,6 +74,16 @@ class GroupScheduleScreenViewModel(private val scheduleRepository: ScheduleRepos
                     }
                 }
             }
+
+            is ScheduleEvent.OnNetworkChange -> {
+                viewModelScope.launch {
+                    _state.update {
+                        it.copy(
+                            isConnected = event.isConnected
+                        )
+                    }
+                }
+            }
         }
     }
 

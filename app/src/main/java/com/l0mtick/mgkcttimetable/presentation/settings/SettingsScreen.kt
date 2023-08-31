@@ -48,7 +48,6 @@ fun SettingsScreen(
     val viewModel: SettingsScreenViewModel = viewModel(factory = viewModelFactory)
     val state = viewModel.state.collectAsState().value
     val onEvent = viewModel::onEvent
-
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(

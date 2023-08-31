@@ -68,6 +68,16 @@ class TeacherScheduleScreenViewModel(private val scheduleRepository: ScheduleRep
                     }
                 }
             }
+
+            is ScheduleEvent.OnNetworkChange -> {
+                viewModelScope.launch {
+                    _state.update {
+                        it.copy(
+                            isConnected = event.isConnected
+                        )
+                    }
+                }
+            }
         }
     }
 

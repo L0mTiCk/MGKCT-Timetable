@@ -1,5 +1,7 @@
 package com.l0mtick.mgkcttimetable.domain.repository
 
+import android.content.Context
+
 interface ScheduleRepository {
     suspend fun parseTimetable(): MutableMap<String, List<Map<Int, List<String>>>>?
 
@@ -19,5 +21,5 @@ interface ScheduleRepository {
 
     suspend fun getAllTeacherNames(): List<String>?
 
-
+    fun getConnectionStatus(context: Context, callback: (Boolean) -> Unit)
 }

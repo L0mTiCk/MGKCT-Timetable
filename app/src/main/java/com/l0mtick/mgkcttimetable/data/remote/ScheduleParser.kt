@@ -40,7 +40,7 @@ suspend fun parseRawTimetable(): MutableMap<String, List<Map<Int, List<String>>>
 }
 
 fun mapTimetable(doc: Document): MutableMap<String, List<Map<Int, List<String>>>> {
-    Log.d("timetable_parser", "parse and save")
+    Log.d(TIMETABLE_TAG, "parse and save")
 
     val allGroups: Elements = doc.select("tbody")
     val groups: Elements = doc.select("h2")
@@ -102,7 +102,7 @@ fun mapTimetable(doc: Document): MutableMap<String, List<Map<Int, List<String>>>
     }
 //    Log.d(TIMETABLE_TAG, "$groupLessonsMap")
 //    Log.d(TIMETABLE_TAG, "${groupLessonsMap.get("Преподаватель - Липень А. В.")}")
-    Log.d("timetable_parser", "finished")
+    Log.d(TIMETABLE_TAG, "finished")
 
     return groupLessonsMap
 }

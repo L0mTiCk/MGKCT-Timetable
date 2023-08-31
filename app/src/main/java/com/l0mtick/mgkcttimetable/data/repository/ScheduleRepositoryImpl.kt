@@ -1,6 +1,12 @@
 package com.l0mtick.mgkcttimetable.data.repository
 
+import android.content.Context
 import android.content.SharedPreferences
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
+import androidx.core.content.ContextCompat
 import com.l0mtick.mgkcttimetable.data.database.ScheduleDao
 import com.l0mtick.mgkcttimetable.data.database.ScheduleEntity
 import com.l0mtick.mgkcttimetable.data.remote.parseRawTimetable
@@ -86,5 +92,33 @@ class ScheduleRepositoryImpl(
 
     override suspend fun getAllTeacherNames(): List<String>? {
         return scheduleDao.getAllNames()?.filter { it.contains("Преподаватель") }
+    }
+
+    override fun getConnectionStatus(context: Context, callback: (Boolean) -> Unit) {
+        val networkRequest = NetworkRequest.Builder()
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .build()
+        val connectivityManager = ContextCompat.getSystemService(
+            context,
+            ConnectivityManager::class.java
+        ) as ConnectivityManager
+        val networkCallback = object : ConnectivityManager.NetworkCallback() {
+            // network is available for use
+            override fun onAvailable(network: Network) {
+                super.onAvailable(network)
+                callback(true)
+            }
+
+            // lost network connection
+            override fun onLost(network: Network) {
+                super.onLost(network)
+                callback(false)
+            }
+        }
+        connectivityManager.requestNetwork(networkRequest, networkCallback)
+        val networkCapabilities = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+        val isWifiConnected = networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
+        val isMobileConnected = networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true
+        callback(isMobileConnected || isWifiConnected)
     }
 }
