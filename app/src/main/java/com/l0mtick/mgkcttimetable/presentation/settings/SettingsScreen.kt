@@ -48,6 +48,11 @@ fun SettingsScreen(
     val viewModel: SettingsScreenViewModel = viewModel(factory = viewModelFactory)
     val state = viewModel.state.collectAsState().value
     val onEvent = viewModel::onEvent
+
+    AnimatedVisibility(visible = state.isAppInfoDialogOpen) {
+        AppInfoDialogBox(onEvent = onEvent)
+    }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -184,8 +189,5 @@ fun SettingsScreen(
                 AppInfoRowItem(onEvent = onEvent)
             }
         }
-    }
-    AnimatedVisibility(visible = state.isAppInfoDialogOpen) {
-        AppInfoDialogBox(onEvent = onEvent)
     }
 }

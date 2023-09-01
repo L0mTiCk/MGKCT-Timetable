@@ -24,6 +24,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
-import com.l0mtick.mgkcttimetable.presentation.components.BottomNavigation
 import com.l0mtick.mgkcttimetable.presentation.components.NoConnectionCard
 import com.l0mtick.mgkcttimetable.presentation.components.ScheduleDayCard
 import com.l0mtick.mgkcttimetable.presentation.schedule.ScheduleEvent
@@ -50,24 +50,21 @@ fun StudentScheduleScreen(
     val state = groupScheduleScreenViewModel.state.collectAsState().value
     val onEvent = groupScheduleScreenViewModel::onEvent
     val context = LocalContext.current
-    scheduleRepository.getConnectionStatus(
-        context = context,
-        callback = {
+    LaunchedEffect(true) {
+        scheduleRepository.getConnectionStatus(
+            context = context,
+            callback = {
             onEvent(ScheduleEvent.OnNetworkChange(it))
-        }
-    )
-    Scaffold(
-        bottomBar = {
-            BottomNavigation(navController = navController, currentScreenId = 1)
-        }
-    ) {
+        })
+    }
+    Scaffold {
         Box(
             //contentAlignment = Alignment.Center,
             modifier = Modifier.fillMaxSize()
         ) {
             AnimatedVisibility(
                 visible = state.isScheduleUpdating,
-                enter = fadeIn(animationSpec = tween(200)),
+                enter = fadeIn(animationSpec = tween(150)),
             ) {
                 Column(
                     modifier = Modifier.fillMaxSize(),

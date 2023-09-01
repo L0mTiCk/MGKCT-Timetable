@@ -24,6 +24,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
-import com.l0mtick.mgkcttimetable.presentation.components.BottomNavigation
 import com.l0mtick.mgkcttimetable.presentation.components.NoConnectionCard
 import com.l0mtick.mgkcttimetable.presentation.components.ScheduleDayCard
 import com.l0mtick.mgkcttimetable.presentation.schedule.ScheduleEvent
@@ -50,18 +50,14 @@ fun TeacherScheduleScreen(
     val state = teacherScheduleScreenViewModel.state.collectAsState().value
     val onEvent = teacherScheduleScreenViewModel::onEvent
     val context = LocalContext.current
-    scheduleRepository.getConnectionStatus(
-        context = context,
-        callback = {
-            onEvent(ScheduleEvent.OnNetworkChange(it))
-        }
-    )
-
-    Scaffold(
-        bottomBar = {
-            BottomNavigation(navController = navController, currentScreenId = 2)
-        }
-    ) {
+    LaunchedEffect(true) {
+        scheduleRepository.getConnectionStatus(
+            context = context,
+            callback = {
+                onEvent(ScheduleEvent.OnNetworkChange(it))
+            })
+    }
+    Scaffold {
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
