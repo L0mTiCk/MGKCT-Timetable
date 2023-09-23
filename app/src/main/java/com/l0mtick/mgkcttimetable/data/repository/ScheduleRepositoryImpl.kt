@@ -6,13 +6,16 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import android.util.Log
 import androidx.core.content.ContextCompat
 import com.l0mtick.mgkcttimetable.data.database.ScheduleDao
 import com.l0mtick.mgkcttimetable.data.database.ScheduleEntity
+import com.l0mtick.mgkcttimetable.data.remote.ScheduleApi
 import com.l0mtick.mgkcttimetable.data.remote.parseRawTimetable
 import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 private const val SAVE_GROUP = "saved_group"
@@ -21,14 +24,13 @@ private const val SAVE_TEACHER = "saved_teacher"
 
 class ScheduleRepositoryImpl(
     private val sharedPreferences: SharedPreferences,
-    private val scheduleDao: ScheduleDao
+    private val scheduleDao: ScheduleDao,
+//    private val scheduleApi: ScheduleApi
 ): ScheduleRepository {
     override suspend fun parseTimetable(): MutableMap<String, List<Map<Int, List<String>>>>? {
         val schedule = parseRawTimetable()
         if (schedule != null)
-            CoroutineScope(Dispatchers.IO).launch {
-                saveTimetableToDb(schedule)
-            }
+            saveTimetableToDb(schedule)
         return schedule
     }
     
@@ -54,17 +56,21 @@ class ScheduleRepositoryImpl(
 
     override suspend fun saveTimetableToDb(schedule: MutableMap<String, List<Map<Int, List<String>>>>) {
         for (key in schedule.keys) {
-            val existingScheduleEntity = scheduleDao.getScheduleForGroup(key)
-            if (existingScheduleEntity != null) {
-                // Update the existing entity
-                existingScheduleEntity.schedule = schedule[key]!!
-                scheduleDao.updateSchedule(existingScheduleEntity)
-            } else {
-                // Insert a new entity
-                val newScheduleEntity = ScheduleEntity(groupName = key, schedule = schedule[key]!!)
-                scheduleDao.insertSchedule(newScheduleEntity)
+            CoroutineScope(Dispatchers.IO).async {
+                val existingScheduleEntity = scheduleDao.getScheduleForGroup(key)
+                if (existingScheduleEntity != null) {
+                    // Update the existing entity
+                    existingScheduleEntity.schedule = schedule[key]!!
+                    scheduleDao.updateSchedule(existingScheduleEntity)
+                } else {
+                    // Insert a new entity
+                    val newScheduleEntity =
+                        ScheduleEntity(groupName = key, schedule = schedule[key]!!)
+                    scheduleDao.insertSchedule(newScheduleEntity)
+                }
             }
         }
+        Log.d("timetable_parser", "Saved to DB")
     }
 
     override fun saveGroup(group: String) {

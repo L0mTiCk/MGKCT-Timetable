@@ -73,7 +73,7 @@ fun ScheduleDayCard(day: Int, lessons:  List<String>, auditory: List<String>, le
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = getDayOfWeekNameAndNumber(day),
+                text = "TODO:",
                 fontSize = 22.sp,
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
                 modifier = Modifier
@@ -98,8 +98,13 @@ fun ScheduleDayCard(day: Int, lessons:  List<String>, auditory: List<String>, le
             Column {
                 lessons.forEachIndexed { index, s ->
                     val backgroundColor by animateColorAsState(
-                        targetValue = if (lessonNumbers.get(index).toInt() == currentLessonNumber && state.currentDayOfWeek?.value == day + 1) {
-                            Log.d("timetableTest", "selected day - ${state.selectedDay}, card ${day + 1}")
+                        targetValue = if (lessonNumbers.get(index)
+                                .toInt() == currentLessonNumber && state.currentDayOfWeek?.value == day + 1
+                        ) {
+                            Log.d(
+                                "timetableTest",
+                                "selected day - ${state.selectedDay}, card ${day + 1}"
+                            )
                             MaterialTheme.colorScheme.tertiaryContainer
                         } else {
                             Color.Transparent
@@ -113,8 +118,7 @@ fun ScheduleDayCard(day: Int, lessons:  List<String>, auditory: List<String>, le
                                 shape = RoundedCornerShape(20.dp)
                             )
                             .padding(horizontal = 20.dp, vertical = 10.dp)
-                            .fillMaxWidth()
-                            ,
+                            .fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
@@ -136,15 +140,4 @@ fun ScheduleDayCard(day: Int, lessons:  List<String>, auditory: List<String>, le
             }
         }
     }
-}
-
-fun getDayOfWeekNameAndNumber(dayOfWeek: Int): String {
-    val day = DayOfWeek.of(dayOfWeek + 1)
-    val dayName = day.getDisplayName(TextStyle.FULL, Locale.getDefault())
-    val currentDate = LocalDate.now()
-    val currentDayOfWeek = currentDate.dayOfWeek.value
-    val daysToAdd = dayOfWeek + 1 - currentDayOfWeek
-    val date = currentDate.plusDays(daysToAdd.toLong())
-    val dayNumber = date.dayOfMonth
-    return "${dayNumber}. ${dayName.replaceFirstChar { it.uppercase() }}"
 }

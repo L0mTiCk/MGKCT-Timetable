@@ -17,7 +17,7 @@ class TeacherScheduleScreenViewModel(private val scheduleRepository: ScheduleRep
 
     private val _state = MutableStateFlow(
         ScheduleState(
-        selectedGroup = "Преподаватель - Амброжи Н. М."
+        selectedGroup = "Empty"
     )
     )
     val state = _state.asStateFlow()

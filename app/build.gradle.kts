@@ -78,7 +78,7 @@ dependencies {
     //viewmodel
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
 
-    //parser
+    //parser TODO: remove that when migrated to API
     implementation("org.jsoup:jsoup:1.16.1")
 
     //room
@@ -87,7 +87,9 @@ dependencies {
     implementation("androidx.room:room-ktx:$room_version")
 
     //gson
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
     implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.beust:klaxon:5.5")
 
     //splashscreen
     implementation("androidx.core:core-splashscreen:1.0.1")

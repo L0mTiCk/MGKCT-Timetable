@@ -1,4 +1,4 @@
-package com.l0mtick.mgkcttimetable.domain.repository.model
+package com.l0mtick.mgkcttimetable.domain.model
 
 import androidx.compose.ui.graphics.vector.ImageVector
 

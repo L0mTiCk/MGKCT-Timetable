@@ -31,7 +31,7 @@ import androidx.room.Room
 import com.l0mtick.mgkcttimetable.data.database.AppDatabase
 import com.l0mtick.mgkcttimetable.data.repository.ScheduleRepositoryImpl
 import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
-import com.l0mtick.mgkcttimetable.domain.repository.model.NavigationItem
+import com.l0mtick.mgkcttimetable.domain.model.NavigationItem
 import com.l0mtick.mgkcttimetable.presentation.schedule.group.StudentScheduleScreen
 import com.l0mtick.mgkcttimetable.presentation.schedule.teacher.TeacherScheduleScreen
 import com.l0mtick.mgkcttimetable.presentation.settings.SettingsScreen
