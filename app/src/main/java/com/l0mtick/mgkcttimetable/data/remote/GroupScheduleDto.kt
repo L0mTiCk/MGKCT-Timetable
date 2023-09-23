@@ -12,53 +12,53 @@ private fun <T> Klaxon.convert(k: kotlin.reflect.KClass<*>, fromJson: (JsonValue
 
 private val klaxon = Klaxon()
     .convert(Type::class,        { Type.fromValue(it.string!!) }, { "\"${it.value}\"" })
-    .convert(LessonUnion::class, { LessonUnion.fromJson(it) },    { it.toJson() }, true)
+    .convert(GroupLessonUnion::class, { GroupLessonUnion.fromJson(it) },    { it.toJson() }, true)
 
 data class GroupScheduleDto (
-    val response: Response
+    val response: GroupResponse
 ) {
-    public fun toJson() = klaxon.toJsonString(this)
+    fun toJson() = klaxon.toJsonString(this)
 
     companion object {
-        public fun fromJson(json: String) = klaxon.parse<GroupScheduleDto>(json)
+        fun fromJson(json: String) = klaxon.parse<GroupScheduleDto>(json)
     }
 }
 
-data class Response (
-    val days: List<Day>,
+data class GroupResponse (
+    val days: List<GroupDay>,
     val update: Long,
     val changed: Long,
     val lastSuccess: Boolean
 )
 
-data class Day (
+data class GroupDay (
     val weekday: String,
     val day: String,
-    val lessons: List<LessonUnion>
+    val lessons: List<GroupLessonUnion>
 )
 
-sealed class LessonUnion {
-    class LessonClassArrayValue(val value: List<LessonClass>) : LessonUnion()
-    class LessonClassValue(val value: LessonClass)            : LessonUnion()
-    class NullValue()                                         : LessonUnion()
+sealed class GroupLessonUnion {
+    class LessonClassArrayValue(val value: List<GroupLessonClass>) : GroupLessonUnion()
+    class LessonClassValue(val value: GroupLessonClass)            : GroupLessonUnion()
+    class NullValue()                                         : GroupLessonUnion()
 
-    public fun toJson(): String = klaxon.toJsonString(when (this) {
+    fun toJson(): String = klaxon.toJsonString(when (this) {
         is LessonClassArrayValue -> this.value
         is LessonClassValue -> this.value
         is NullValue -> "null"
     })
 
     companion object {
-        public fun fromJson(jv: JsonValue): LessonUnion = when (jv.inside) {
-            is JsonArray<*> -> LessonClassArrayValue(jv.array?.let { klaxon.parseFromJsonArray<LessonClass>(it) }!!)
-            is JsonObject   -> LessonClassValue(jv.obj?.let { klaxon.parseFromJsonObject<LessonClass>(it) }!!)
+        fun fromJson(jv: JsonValue): GroupLessonUnion = when (jv.inside) {
+            is JsonArray<*> -> LessonClassArrayValue(jv.array?.let { klaxon.parseFromJsonArray<GroupLessonClass>(it) }!!)
+            is JsonObject   -> LessonClassValue(jv.obj?.let { klaxon.parseFromJsonObject<GroupLessonClass>(it) }!!)
             null            -> NullValue()
             else            -> throw IllegalArgumentException()
         }
     }
 }
 
-data class LessonClass (
+data class GroupLessonClass (
     val subgroup: Long? = null,
     val lesson: String,
     val type: Type,
@@ -68,15 +68,21 @@ data class LessonClass (
 )
 
 enum class Type(val value: String) {
-    Лек("Лек"),
-    Лр("ЛР"),
-    ФВ("ф-в");
+    Lek("Лек"),
+    Lr("ЛР"),
+    FV("ф-в"),
+    Prka("Пр-ка"),
+    Kp("КП"),
+    Pr("ПР");
 
     companion object {
-        public fun fromValue(value: String): Type = when (value) {
-            "Лек" -> Лек
-            "ЛР"  -> Лр
-            "ф-в" -> ФВ
+        fun fromValue(value: String): Type = when (value) {
+            "Лек" -> Lek
+            "ЛР"  -> Lr
+            "ф-в" -> FV
+            "ПР" -> Pr
+            "КП" -> Kp
+            "Пр-ка" -> Prka
             else  -> throw IllegalArgumentException()
         }
     }
