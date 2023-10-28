@@ -22,4 +22,8 @@ interface ScheduleRepository {
     suspend fun getAllTeacherNames(): List<String>?
 
     fun getConnectionStatus(context: Context, callback: (Boolean) -> Unit)
+
+    fun saveStartDestinationRoute(route: String)
+
+    fun getSavedStartDestinationRoute(): String?
 }

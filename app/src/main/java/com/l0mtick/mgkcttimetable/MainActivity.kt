@@ -2,6 +2,7 @@ package com.l0mtick.mgkcttimetable
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,6 +31,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
 import com.l0mtick.mgkcttimetable.data.database.AppDatabase
 import com.l0mtick.mgkcttimetable.data.repository.ScheduleRepositoryImpl
+import com.l0mtick.mgkcttimetable.data.utils.Constants
 import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
 import com.l0mtick.mgkcttimetable.domain.model.NavigationItem
 import com.l0mtick.mgkcttimetable.presentation.schedule.group.StudentScheduleScreen
@@ -46,14 +48,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         actionBar?.hide()
-        database = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "my-database")
+        database = Room.databaseBuilder(applicationContext, AppDatabase::class.java, Constants.DATABASE_NAME)
             .fallbackToDestructiveMigration()
             .build()
-        val sharedPreferences = getSharedPreferences("MGKCT-Timetable", Context.MODE_PRIVATE)
+        val sharedPreferences = getSharedPreferences(Constants.SHARED_PREF_NAME, Context.MODE_PRIVATE)
         val scheduleRepository: ScheduleRepository = ScheduleRepositoryImpl(sharedPreferences, database.scheduleDao())
-//        CoroutineScope(Dispatchers.IO).launch {
-//            database.clearAllTables()
-//        }
         val navItems = listOf(
             NavigationItem(
                 title = "Group",
@@ -80,15 +79,20 @@ class MainActivity : ComponentActivity() {
                                 val currentDestination = navBackStackEntry?.destination
                                 navItems.forEach { screen ->
                                     NavigationBarItem(
+                                        label = { Text(screen.title) },
+                                        selected = currentDestination?.hierarchy?.any { it.route == screen.title.lowercase() } == true,
                                         icon = {
                                             Icon(
-                                                screen.selectedIcon,
+                                                if (currentDestination?.hierarchy?.any { it.route == screen.title.lowercase() } == true) {
+                                                    screen.selectedIcon
+                                                } else {
+                                                    screen.unselectedIcon
+                                                },
                                                 contentDescription = null
                                             )
                                         },
-                                        label = { Text(screen.title) },
-                                        selected = currentDestination?.hierarchy?.any { it.route == screen.title.lowercase() } == true,
                                         onClick = {
+                                            scheduleRepository.saveStartDestinationRoute(screen.title.lowercase())
                                             navController.navigate(screen.title.lowercase()) {
                                                 // Pop up to the start destination of the graph to
                                                 // avoid building up a large stack of destinations
@@ -108,7 +112,7 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     ) {
-                        NavHost(navController = navController, startDestination = "group", modifier = Modifier.padding(it)) {
+                        NavHost(navController = navController, startDestination = scheduleRepository.getSavedStartDestinationRoute() ?: "group", modifier = Modifier.padding(it)) {
                             composable("group") {
                                 StudentScheduleScreen(
                                     scheduleRepository = scheduleRepository,

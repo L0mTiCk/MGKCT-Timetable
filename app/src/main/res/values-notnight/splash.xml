@@ -7,10 +7,7 @@
         <item name="windowSplashScreenAnimatedIcon">@drawable/avd_anim</item>
         <item name="windowSplashScreenIconBackgroundColor">@color/ic_launcher_background</item>
         <!-- Required for animated icons -->
-        <item name="windowSplashScreenAnimationDuration">1000</item>
-
-        <!-- Set the theme of the Activity that directly follows your splash screen. -->
-        <!-- Required -->
+        <item name="windowSplashScreenAnimationDuration">800</item>
         <item name="postSplashScreenTheme">@style/Theme.MGKCTTimetable</item>
     </style>
 </resources>

@@ -12,15 +12,12 @@ import com.l0mtick.mgkcttimetable.data.database.ScheduleDao
 import com.l0mtick.mgkcttimetable.data.database.ScheduleEntity
 import com.l0mtick.mgkcttimetable.data.remote.ScheduleApi
 import com.l0mtick.mgkcttimetable.data.remote.parseRawTimetable
+import com.l0mtick.mgkcttimetable.data.utils.Constants
 import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-
-private const val SAVE_GROUP = "saved_group"
-private const val SAVE_TEACHER = "saved_teacher"
-
 
 class ScheduleRepositoryImpl(
     private val sharedPreferences: SharedPreferences,
@@ -75,21 +72,21 @@ class ScheduleRepositoryImpl(
 
     override fun saveGroup(group: String) {
         when (group.length) {
-            in 1..6 -> sharedPreferences.edit().putString(SAVE_GROUP, "Группа - $group").apply()
-            else -> sharedPreferences.edit().putString(SAVE_GROUP, group).apply()
+            in 1..6 -> sharedPreferences.edit().putString(Constants.SAVE_GROUP, "Группа - $group").apply()
+            else -> sharedPreferences.edit().putString(Constants.SAVE_GROUP, group).apply()
         }
     }
 
     override fun getSavedGroup(): String? {
-        return sharedPreferences.getString(SAVE_GROUP, null)
+        return sharedPreferences.getString(Constants.SAVE_GROUP, null)
     }
 
     override fun saveTeacher(group: String) {
-        sharedPreferences.edit().putString(SAVE_TEACHER, group).apply()
+        sharedPreferences.edit().putString(Constants.SAVE_TEACHER, group).apply()
     }
 
     override fun getSavedTeacher(): String? {
-        return sharedPreferences.getString(SAVE_TEACHER, null)
+        return sharedPreferences.getString(Constants.SAVE_TEACHER, null)
     }
 
     override suspend fun getAllGroupNames(): List<String>? {
@@ -126,5 +123,13 @@ class ScheduleRepositoryImpl(
         val isWifiConnected = networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
         val isMobileConnected = networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true
         callback(isMobileConnected || isWifiConnected)
+    }
+
+    override fun saveStartDestinationRoute(route: String) {
+        sharedPreferences.edit().putString(Constants.SAVE_ROUTE, route).apply()
+    }
+
+    override fun getSavedStartDestinationRoute(): String? {
+        return sharedPreferences.getString(Constants.SAVE_ROUTE, "group")
     }
 }
