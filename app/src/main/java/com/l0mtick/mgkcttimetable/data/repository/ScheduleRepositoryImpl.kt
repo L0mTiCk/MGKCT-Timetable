@@ -20,14 +20,25 @@ import kotlinx.coroutines.launch
 
 private const val SAVE_GROUP = "saved_group"
 private const val SAVE_TEACHER = "saved_teacher"
+private const val API_LOG = "api_test"
 
 
 class ScheduleRepositoryImpl(
     private val sharedPreferences: SharedPreferences,
     private val scheduleDao: ScheduleDao,
-//    private val scheduleApi: ScheduleApi
+    private val scheduleApi: ScheduleApi
 ): ScheduleRepository {
     override suspend fun parseTimetable(): MutableMap<String, List<Map<Int, List<String>>>>? {
+        CoroutineScope(Dispatchers.IO).launch {
+            val allGroups = scheduleApi.getAllGroupsNumbers().response
+            Log.d(API_LOG, allGroups.toString())
+//            if (allGroups != null) {
+//                for (group in allGroups) {
+//                    Log.d(API_LOG, scheduleApi.getGroupSchedule(group.toInt()).toString())
+//                }
+//            }
+            Log.d(API_LOG, scheduleApi.getAllTeacherNames())
+        }
         val schedule = parseRawTimetable()
         if (schedule != null)
             saveTimetableToDb(schedule)

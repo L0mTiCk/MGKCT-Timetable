@@ -29,6 +29,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
 import com.l0mtick.mgkcttimetable.data.database.AppDatabase
+import com.l0mtick.mgkcttimetable.data.remote.ScheduleApiImpl
 import com.l0mtick.mgkcttimetable.data.repository.ScheduleRepositoryImpl
 import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
 import com.l0mtick.mgkcttimetable.domain.model.NavigationItem
@@ -46,14 +47,12 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         actionBar?.hide()
+        val api = ScheduleApiImpl()
         database = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "my-database")
             .fallbackToDestructiveMigration()
             .build()
         val sharedPreferences = getSharedPreferences("MGKCT-Timetable", Context.MODE_PRIVATE)
-        val scheduleRepository: ScheduleRepository = ScheduleRepositoryImpl(sharedPreferences, database.scheduleDao())
-//        CoroutineScope(Dispatchers.IO).launch {
-//            database.clearAllTables()
-//        }
+        val scheduleRepository: ScheduleRepository = ScheduleRepositoryImpl(sharedPreferences, database.scheduleDao(), api)
         val navItems = listOf(
             NavigationItem(
                 title = "Group",

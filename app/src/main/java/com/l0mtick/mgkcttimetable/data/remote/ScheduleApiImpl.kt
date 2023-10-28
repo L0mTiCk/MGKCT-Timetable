@@ -1,5 +1,6 @@
 package com.l0mtick.mgkcttimetable.data.remote
 
+import com.l0mtick.mgkcttimetable.data.remote.dto.GroupNumbersDto
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -10,7 +11,7 @@ private const val token = "b6xUMDWDrndJ2aIwVekKPX3NoDWfnQaFuKL38ZJ0efNTMw1FNzt4S
 private val client = OkHttpClient()
 
 class ScheduleApiImpl: ScheduleApi {
-    override suspend fun getGroupSchedule(groupNumber: Int) {
+    override suspend fun getGroupSchedule(groupNumber: Int): String {
         val json = "{\"group\": $groupNumber}"
         val requestBody = json.toRequestBody("application/json".toMediaTypeOrNull())
         val request = Request.Builder()
@@ -23,9 +24,14 @@ class ScheduleApiImpl: ScheduleApi {
             .build()
         val response = client.newCall(request).execute()
         if (response.isSuccessful) {
-            val schedule = GroupScheduleDto.fromJson(response.body?.string() ?: "")
+            try {
+                val schedule = GroupScheduleDto.fromJson(response.body?.string() ?: "")
+                return schedule.toString()
+            } catch (e: Exception) {
+            }
         }
         //TODO: return schedule for group
+        return "empty"
     }
 
     override suspend fun getTeacherSchedule(teacher: String) {
@@ -45,7 +51,7 @@ class ScheduleApiImpl: ScheduleApi {
         }
     }
 
-    override suspend fun getAllGroupsNumbers() {
+    override suspend fun getAllGroupsNumbers(): GroupNumbersDto {
         val request = Request.Builder()
             .url("$api_url/getGroups")
             .header(
@@ -55,8 +61,12 @@ class ScheduleApiImpl: ScheduleApi {
             .build()
         val response = client.newCall(request).execute()
         if (response.isSuccessful) {
-            //TODO: all groups dto
+            try {
+                return GroupNumbersDto.fromJson(response.body?.string() ?: "empty")!!
+            } catch (e: Exception) {
+            }
         }
+        return GroupNumbersDto(emptyList())
     }
 
     override suspend fun getAllTeacherNames(): String {
