@@ -1,6 +1,10 @@
 package com.l0mtick.mgkcttimetable.data.remote
 
+import android.util.Log
 import com.l0mtick.mgkcttimetable.data.remote.dto.GroupNumbersDto
+import com.l0mtick.mgkcttimetable.data.remote.dto.GroupScheduleDto
+import com.l0mtick.mgkcttimetable.data.remote.dto.TeacherNamesDto
+import com.l0mtick.mgkcttimetable.data.remote.dto.TeacherScheduleDto
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -11,7 +15,7 @@ private const val token = "b6xUMDWDrndJ2aIwVekKPX3NoDWfnQaFuKL38ZJ0efNTMw1FNzt4S
 private val client = OkHttpClient()
 
 class ScheduleApiImpl: ScheduleApi {
-    override suspend fun getGroupSchedule(groupNumber: Int): String {
+    override suspend fun getGroupSchedule(groupNumber: Int): GroupScheduleDto {
         val json = "{\"group\": $groupNumber}"
         val requestBody = json.toRequestBody("application/json".toMediaTypeOrNull())
         val request = Request.Builder()
@@ -26,16 +30,16 @@ class ScheduleApiImpl: ScheduleApi {
         if (response.isSuccessful) {
             try {
                 val schedule = GroupScheduleDto.fromJson(response.body?.string() ?: "")
-                return schedule.toString()
+                return schedule ?: GroupScheduleDto(null)
             } catch (e: Exception) {
+                Log.e("api_test", "Error while converting group schedule response")
             }
         }
-        //TODO: return schedule for group
-        return "empty"
+        return GroupScheduleDto(response = null)
     }
 
-    override suspend fun getTeacherSchedule(teacher: String) {
-        val json = "{\"teacher\": $teacher}"
+    override suspend fun getTeacherSchedule(teacher: String): TeacherScheduleDto {
+        val json = "{\"teacher\": \"$teacher\"}"
         val requestBody = json.toRequestBody("application/json".toMediaTypeOrNull())
         val request = Request.Builder()
             .url("$api_url/getTeacher")
@@ -47,8 +51,15 @@ class ScheduleApiImpl: ScheduleApi {
             .build()
         val response = client.newCall(request).execute()
         if (response.isSuccessful) {
-            val schedule = TeacherScheduleDto.fromJson(response.body?.string() ?: "")
+            var schedule: TeacherScheduleDto
+            try {
+                schedule = TeacherScheduleDto.fromJson(response.body?.string() ?: "")!!
+                return schedule
+            } catch (e: Exception) {
+                Log.e("api_test", e.message.orEmpty())
+            }
         }
+        return TeacherScheduleDto(null)
     }
 
     override suspend fun getAllGroupsNumbers(): GroupNumbersDto {
@@ -62,14 +73,15 @@ class ScheduleApiImpl: ScheduleApi {
         val response = client.newCall(request).execute()
         if (response.isSuccessful) {
             try {
-                return GroupNumbersDto.fromJson(response.body?.string() ?: "empty")!!
+                return GroupNumbersDto.fromJson(response.body?.string() ?: "null")!!
             } catch (e: Exception) {
+                Log.e("api_test", "Error while converting all group numbers response")
             }
         }
         return GroupNumbersDto(emptyList())
     }
 
-    override suspend fun getAllTeacherNames(): String {
+    override suspend fun getAllTeacherNames(): TeacherNamesDto {
         val request = Request.Builder()
             .url("$api_url/getTeachers")
             .header(
@@ -79,9 +91,12 @@ class ScheduleApiImpl: ScheduleApi {
             .build()
         val response = client.newCall(request).execute()
         if (response.isSuccessful) {
-            //TODO: all teachers dto
-            return response.body?.string() ?: ""
+            try {
+                return TeacherNamesDto.fromJson(response.body?.string() ?: "null")!!
+            } catch (e: Exception) {
+                Log.e("api_test", "Error while converting all teachers response")
+            }
         }
-        return "Error"
+        return TeacherNamesDto(response = null)
     }
 }

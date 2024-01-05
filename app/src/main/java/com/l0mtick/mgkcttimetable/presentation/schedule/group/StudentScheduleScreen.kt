@@ -65,6 +65,7 @@ fun StudentScheduleScreen(
             AnimatedVisibility(
                 visible = state.isScheduleUpdating,
                 enter = fadeIn(animationSpec = tween(150)),
+                exit = fadeOut()
             ) {
                 Column(
                     modifier = Modifier.fillMaxSize(),

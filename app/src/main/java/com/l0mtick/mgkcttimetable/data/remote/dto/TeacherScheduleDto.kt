@@ -1,4 +1,4 @@
-package com.l0mtick.mgkcttimetable.data.remote
+package com.l0mtick.mgkcttimetable.data.remote.dto
 import com.beust.klaxon.*
 
 private fun <T> Klaxon.convert(k: kotlin.reflect.KClass<*>, fromJson: (JsonValue) -> T, toJson: (T) -> String, isUnion: Boolean = false) =
@@ -13,31 +13,31 @@ private val klaxon = Klaxon()
     .convert(Type::class, { Type.fromValue(it.string!!) }, { "\"${it.value}\"" })
 
 data class TeacherScheduleDto (
-    val response: TeacherResponse? = null
+    val response: Response? = null
 ) {
-    fun toJson() = klaxon.toJsonString(this)
+    public fun toJson() = klaxon.toJsonString(this)
 
     companion object {
-        fun fromJson(json: String) = klaxon.parse<TeacherScheduleDto>(json)
+        public fun fromJson(json: String) = klaxon.parse<TeacherScheduleDto>(json)
     }
 }
 
-data class TeacherResponse (
-    val days: List<TeacherDay>? = null,
+data class Response (
+    val days: List<Day>? = null,
     val update: Long? = null,
     val changed: Long? = null,
     val lastSuccess: Boolean? = null
 )
 
-data class TeacherDay (
+data class Day (
     val weekday: String? = null,
     val day: String? = null,
-    val lessons: List<TeacherLesson?>? = null
+    val lessons: List<Lesson?>? = null
 )
 
-data class TeacherLesson (
+data class Lesson (
     val lesson: String? = null,
-    val type: Type? = null,
+    val type: String? = null,
     val group: String? = null,
     val cabinet: String? = null,
     val comment: Any? = null

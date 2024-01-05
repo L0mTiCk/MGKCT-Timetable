@@ -11,34 +11,46 @@ import androidx.core.content.ContextCompat
 import com.l0mtick.mgkcttimetable.data.database.ScheduleDao
 import com.l0mtick.mgkcttimetable.data.database.ScheduleEntity
 import com.l0mtick.mgkcttimetable.data.remote.ScheduleApi
+import com.l0mtick.mgkcttimetable.data.remote.dto.LessonUnion
 import com.l0mtick.mgkcttimetable.data.remote.parseRawTimetable
 import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 private const val SAVE_GROUP = "saved_group"
 private const val SAVE_TEACHER = "saved_teacher"
 private const val API_LOG = "api_test"
 
-
+//TODO: rewrite to use api instead of parser
 class ScheduleRepositoryImpl(
     private val sharedPreferences: SharedPreferences,
     private val scheduleDao: ScheduleDao,
     private val scheduleApi: ScheduleApi
 ): ScheduleRepository {
     override suspend fun parseTimetable(): MutableMap<String, List<Map<Int, List<String>>>>? {
-        CoroutineScope(Dispatchers.IO).launch {
-            val allGroups = scheduleApi.getAllGroupsNumbers().response
-            Log.d(API_LOG, allGroups.toString())
+//        CoroutineScope(Dispatchers.IO).launch {
+//            val allGroups = scheduleApi.getAllGroupsNumbers().response
+//            delay(500)
+//            Log.d(API_LOG, allGroups.toString())
 //            if (allGroups != null) {
 //                for (group in allGroups) {
 //                    Log.d(API_LOG, scheduleApi.getGroupSchedule(group.toInt()).toString())
 //                }
 //            }
-            Log.d(API_LOG, scheduleApi.getAllTeacherNames())
-        }
+//            Log.d(API_LOG, scheduleApi.getAllTeacherNames().response.toString())
+//            delay(500)
+//            Log.d(API_LOG, scheduleApi.getTeacherSchedule("Протасеня А. О.").toString())
+//            delay(500)
+//            val groupSchedule = scheduleApi.getGroupSchedule(55)
+//            when (val lessonUnion = groupSchedule.response?.days?.get(2)?.lessons?.get(0)) {
+//                is LessonUnion.LessonClassValue -> Log.d(API_LOG, lessonUnion.value.toString())
+//                is LessonUnion.LessonClassArrayValue -> Log.d(API_LOG, lessonUnion.value.toString())
+//                else -> {}
+//            }
+//        }
         val schedule = parseRawTimetable()
         if (schedule != null)
             saveTimetableToDb(schedule)
