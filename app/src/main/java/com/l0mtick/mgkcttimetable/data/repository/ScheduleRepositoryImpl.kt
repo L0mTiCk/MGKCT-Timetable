@@ -11,14 +11,14 @@ import androidx.core.content.ContextCompat
 import com.l0mtick.mgkcttimetable.data.database.ScheduleDao
 import com.l0mtick.mgkcttimetable.data.database.ScheduleEntity
 import com.l0mtick.mgkcttimetable.data.remote.ScheduleApi
-import com.l0mtick.mgkcttimetable.data.remote.dto.LessonUnion
-import com.l0mtick.mgkcttimetable.data.remote.parseRawTimetable
+import com.l0mtick.mgkcttimetable.data.remote.mappers.toWeekSchedule
+import com.l0mtick.mgkcttimetable.domain.model.schedule.WeekSchedule
 import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 private const val SAVE_GROUP = "saved_group"
 private const val SAVE_TEACHER = "saved_teacher"
@@ -30,32 +30,23 @@ class ScheduleRepositoryImpl(
     private val scheduleDao: ScheduleDao,
     private val scheduleApi: ScheduleApi
 ): ScheduleRepository {
-    override suspend fun parseTimetable(): MutableMap<String, List<Map<Int, List<String>>>>? {
-        Log.d("timetableTest", "Parse timetable")
-            CoroutineScope(Dispatchers.IO).launch {
-                try {
-                    val allGroups = scheduleApi.getAllGroupsNumbers().response
-                    delay(500)
-                    Log.d(API_LOG, allGroups.toString())
-                } catch (e: Exception) {
-                    Log.e(API_LOG, e.toString())
-                }
-//            Log.d(API_LOG, scheduleApi.getAllTeacherNames().response.toString())
-//            delay(500)
-//            Log.d(API_LOG, scheduleApi.getTeacherSchedule("Протасеня А. О.").toString())
-//            delay(500)
-//            val groupSchedule = scheduleApi.getGroupSchedule("62")
-//            Log.d(API_LOG, groupSchedule.response.toString())
-//            when (val lessonUnion = groupSchedule.response?.days?.get(2)?.lessons?.get(0)) {
-//                is LessonUnion.LessonClassValue -> Log.d(API_LOG, lessonUnion.value.toString())
-//                is LessonUnion.LessonClassArrayValue -> Log.d(API_LOG, lessonUnion.value.toString())
-//                is LessonUnion.NullValue -> Log.d(API_LOG, "Null lesson")
-//                else -> {}
-//            }
+    override suspend fun parseGroupTimetable(groupNumber: String): WeekSchedule {
+        return withContext(Dispatchers.IO) {
+            try {
+                val result = scheduleApi.getGroupSchedule(groupNumber).toWeekSchedule()
+                Log.d(API_LOG, result.toString())
+                result
+            } catch (e: Exception) {
+                Log.e(API_LOG, e.toString())
+                WeekSchedule(null, "", "")
             }
-        return null
+        }
     }
-    
+
+    //TODO: write mapper for teacherDTO
+    override suspend fun parseTeacherTimetable(groupNumber: String): WeekSchedule {
+        TODO("Not yet implemented")
+    }
     override suspend fun getDbGroupTimetable(mode: Int): List<Map<Int, List<String>>>? {
         val groupName = getSavedGroup()
         val teacherName = getSavedTeacher()
@@ -97,7 +88,7 @@ class ScheduleRepositoryImpl(
 
     override fun saveGroup(group: String) {
         when (group.length) {
-            in 1..6 -> sharedPreferences.edit().putString(SAVE_GROUP, "Группа - $group").apply()
+            in 1..6 -> sharedPreferences.edit().putString(SAVE_GROUP, group).apply()
             else -> sharedPreferences.edit().putString(SAVE_GROUP, group).apply()
         }
     }
@@ -114,12 +105,18 @@ class ScheduleRepositoryImpl(
         return sharedPreferences.getString(SAVE_TEACHER, null)
     }
 
-    override suspend fun getAllGroupNames(): List<String>? {
-        return scheduleDao.getAllNames()?.filter { it.contains("Группа") }
+    override suspend fun getAllGroupNames(): List<Long>? {
+        val a = CoroutineScope(Dispatchers.IO).async {
+         scheduleApi.getAllGroupsNumbers().response
+        }.await()
+        return a
     }
 
     override suspend fun getAllTeacherNames(): List<String>? {
-        return scheduleDao.getAllNames()?.filter { it.contains("Преподаватель") }
+        val a = CoroutineScope(Dispatchers.IO).async {
+            scheduleApi.getAllTeacherNames().response
+        }.await()
+        return a
     }
 
     override fun getConnectionStatus(context: Context, callback: (Boolean) -> Unit) {

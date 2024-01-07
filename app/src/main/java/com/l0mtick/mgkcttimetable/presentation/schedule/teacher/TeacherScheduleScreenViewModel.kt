@@ -1,6 +1,5 @@
 package com.l0mtick.mgkcttimetable.presentation.schedule.teacher
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
@@ -17,7 +16,7 @@ class TeacherScheduleScreenViewModel(private val scheduleRepository: ScheduleRep
 
     private val _state = MutableStateFlow(
         ScheduleState(
-        selectedGroup = "Empty"
+        selectedGroup = "Никто не выбран"
     )
     )
     val state = _state.asStateFlow()
@@ -42,15 +41,11 @@ class TeacherScheduleScreenViewModel(private val scheduleRepository: ScheduleRep
                     onEvent(ScheduleEvent.OnUpdatingStart)
                     _state.update {
                         it.copy(
-                            groupSchedule = scheduleRepository.getDbGroupTimetable(1) ?: listOf(emptyMap(), emptyMap(), emptyMap()),
-                            selectedGroup = scheduleRepository.getSavedTeacher() ?: "Никто не выбран",
-                            isScheduleUpdating = false
+                            groupSchedule = scheduleRepository.parseGroupTimetable(_state.value.selectedGroup),
+                            selectedGroup = scheduleRepository.getSavedTeacher() ?: "Никто не выбран"
                         )
                     }
                     onEvent(ScheduleEvent.OnUpdatingFinished)
-                    Log.d("timetableTest", "${_state.value.groupSchedule}")
-                    Log.d("timetableTest", "${_state.value.currentDayOfWeek}")
-                    Log.d("timetableTest", "${_state.value.selectedDay}")
                 }
             }
 

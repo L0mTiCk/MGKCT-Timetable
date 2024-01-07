@@ -7,29 +7,56 @@ import com.l0mtick.mgkcttimetable.domain.model.schedule.DaySchedule
 import com.l0mtick.mgkcttimetable.domain.model.schedule.Lesson
 import com.l0mtick.mgkcttimetable.domain.model.schedule.ScheduleUnion
 import com.l0mtick.mgkcttimetable.domain.model.schedule.WeekSchedule
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
-//fun GroupScheduleDto.toWeekSchedule(): WeekSchedule {
-//    response?.days?.forEach {  }
-//    return WeekSchedule(
-//
-//    )
-//}
+fun GroupScheduleDto.toWeekSchedule(): WeekSchedule {
+    val scheduleList = mutableListOf<DaySchedule>()
+    val changedDate = Date(response?.changed ?: 0L)
+    val updateDate = Date(response?.update ?: 0L)
+    val sdf = SimpleDateFormat("dd MMMM HH:mm:ss", Locale.getDefault())
+    val changedFormatted = sdf.format(changedDate)
+    val updateFormatted = sdf.format(updateDate)
+    response?.days?.forEach {
+        scheduleList.add(
+            it.toDaySchedule()
+        )
+    }
+    return WeekSchedule(
+        days = scheduleList,
+        changed = changedFormatted,
+        update = updateFormatted
+    )
+}
 
 fun GroupDay.toDaySchedule(): DaySchedule {
     val lessonList = mutableListOf<ScheduleUnion?>()
-    lessons?.forEach {
+    lessons?.forEachIndexed { index, it ->
         when (it) {
             is LessonUnion.LessonClassArrayValue -> {
-                val resultName: String
-//                val result
-                it.value.forEach {
-
+                val tempList = mutableListOf<Lesson>()
+                it.value.forEach {  lessonClass ->
+                    tempList.add(
+                        Lesson(
+                            number = index + 1,
+                            subgroup = lessonClass.subgroup?.toInt(),
+                            name = lessonClass.lesson,
+                            type = lessonClass.type?.value,
+                            teacher = lessonClass.teacher,
+                            cabinet = lessonClass.cabinet,
+                            comment = lessonClass.comment
+                        )
+                    )
                 }
+                val lessonArrayUnion = ScheduleUnion.LessonArrayValue(tempList)
+                lessonList.add(lessonArrayUnion)
             }
             is LessonUnion.LessonClassValue -> {
                 lessonList.add(
                     ScheduleUnion.LessonValue(
                         Lesson(
+                            number = index + 1,
                             name = it.value.lesson,
                             type = it.value.type?.value,
                             teacher = it.value.teacher,

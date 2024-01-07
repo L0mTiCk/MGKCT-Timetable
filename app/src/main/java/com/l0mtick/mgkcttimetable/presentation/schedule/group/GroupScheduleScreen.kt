@@ -50,12 +50,13 @@ fun GroupScheduleScreen(
     val state = groupScheduleScreenViewModel.state.collectAsState().value
     val onEvent = groupScheduleScreenViewModel::onEvent
     val context = LocalContext.current
+    val weekSchedule = state.groupSchedule
     LaunchedEffect(true) {
         scheduleRepository.getConnectionStatus(
             context = context,
             callback = {
-            onEvent(ScheduleEvent.OnNetworkChange(it))
-        })
+                onEvent(ScheduleEvent.OnNetworkChange(it))
+            })
     }
     Scaffold {
         Box(
@@ -88,15 +89,11 @@ fun GroupScheduleScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = it
                 ) {
-                    val groupLessons = state.groupSchedule.get(0)
-                    val groupAuditory = state.groupSchedule.get(1)
-                    val groupLessonNumbers = state.groupSchedule.get(2)
-
                     stickyHeader {
                         TopAppBar(
                             title = {
                                 Text(
-                                    text = state.selectedGroup
+                                    text = "Группа - ${state.selectedGroup}"
                                 )
                             },
                             actions = {
@@ -119,14 +116,15 @@ fun GroupScheduleScreen(
                             }
                         )
                     }
-
-                    items(groupLessons.keys.toList()) { key ->
-                        ScheduleDayCard(
-                            state = state,
-                            onEvent = onEvent
-                        )
-                    }
-                    if (groupLessons.isEmpty()) {
+                    if (weekSchedule.days != null) {
+                        items(state.groupSchedule.days ?: emptyList()) {
+                            ScheduleDayCard(
+                                state = state,
+                                onEvent = onEvent,
+                                daySchedule = it
+                            )
+                        }
+                    } else {
                         item {
                             Column(
                                 modifier = Modifier.fillMaxSize(),
@@ -142,7 +140,7 @@ fun GroupScheduleScreen(
                     }
                 }
             }
-            NoConnectionCard(isVisible = !state.isConnected)
         }
+        NoConnectionCard(isVisible = !state.isConnected)
     }
 }

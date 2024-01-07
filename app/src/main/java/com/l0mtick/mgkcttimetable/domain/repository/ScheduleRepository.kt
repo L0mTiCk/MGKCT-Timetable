@@ -1,9 +1,12 @@
 package com.l0mtick.mgkcttimetable.domain.repository
 
 import android.content.Context
+import com.l0mtick.mgkcttimetable.domain.model.schedule.WeekSchedule
 
 interface ScheduleRepository {
-    suspend fun parseTimetable(): MutableMap<String, List<Map<Int, List<String>>>>?
+    suspend fun parseGroupTimetable(groupNumber: String): WeekSchedule
+
+    suspend fun parseTeacherTimetable(groupNumber: String): WeekSchedule
 
     suspend fun getDbGroupTimetable(mode: Int): List<Map<Int, List<String>>>?
 
@@ -17,7 +20,7 @@ interface ScheduleRepository {
 
     fun getSavedTeacher(): String?
 
-    suspend fun getAllGroupNames(): List<String>?
+    suspend fun getAllGroupNames(): List<Long>?
 
     suspend fun getAllTeacherNames(): List<String>?
 

@@ -29,7 +29,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -118,11 +117,11 @@ fun SettingsScreen(
                     state.allGroups.sorted().forEach {
                         DropdownMenuItem(
                             text = {
-                                Text(text = it)
+                                Text(text = it.toString())
                             },
                             onClick = {
                                 isGroupExpanded = false
-                                onEvent(SettingsEvent.OnSpecificGroupClick(it))
+                                onEvent(SettingsEvent.OnSpecificGroupClick(it.toString()))
                             }
                         )
                     }

@@ -1,9 +1,10 @@
 package com.l0mtick.mgkcttimetable.domain.model.schedule
 
-import java.util.Date
+import androidx.compose.runtime.Stable
 
+@Stable
 data class WeekSchedule(
     val days: List<DaySchedule>? = null,
-    val update: Date,
-    val changed: Date
+    val update: String,
+    val changed: String
 )

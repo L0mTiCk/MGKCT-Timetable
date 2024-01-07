@@ -50,6 +50,7 @@ fun TeacherScheduleScreen(
     val state = teacherScheduleScreenViewModel.state.collectAsState().value
     val onEvent = teacherScheduleScreenViewModel::onEvent
     val context = LocalContext.current
+    val weekSchedule = state.groupSchedule
     LaunchedEffect(true) {
         scheduleRepository.getConnectionStatus(
             context = context,
@@ -87,15 +88,11 @@ fun TeacherScheduleScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = it
                 ) {
-                    val groupLessons = state.groupSchedule.get(0)
-                    val groupAuditory = state.groupSchedule.get(1)
-                    val groupLessonNumbers = state.groupSchedule.get(2)
-
                     stickyHeader {
                         TopAppBar(
                             title = {
                                 Text(
-                                    text = state.selectedGroup.substring(startIndex = state.selectedGroup.indexOf("-") + 1)
+                                    text = state.selectedGroup
                                 )
                             },
                             actions = {
@@ -118,19 +115,20 @@ fun TeacherScheduleScreen(
                             }
                         )
                     }
-
-                    items(groupLessons.keys.toList()) { key ->
-                        ScheduleDayCard(
-                            state = state,
-                            onEvent = onEvent
-                        )
-                    }
-                    if (groupLessons.isEmpty()) {
+                    if (weekSchedule.days != null) {
+                        items(state.groupSchedule.days ?: emptyList()) {
+                            ScheduleDayCard(
+                                state = state,
+                                onEvent = onEvent,
+                                daySchedule = it
+                            )
+                        }
+                    } else {
                         item {
                             Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center,
                                 modifier = Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
                             ) {
                                 Text(
                                     text = "Пар нет",
@@ -141,7 +139,7 @@ fun TeacherScheduleScreen(
                     }
                 }
             }
-            NoConnectionCard(isVisible = !state.isConnected)
         }
+        NoConnectionCard(isVisible = !state.isConnected)
     }
 }
