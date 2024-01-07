@@ -49,6 +49,13 @@ fun SettingsScreen(
     val state = viewModel.state.collectAsState().value
     val onEvent = viewModel::onEvent
 
+    var isGroupExpanded by remember {
+        mutableStateOf(false)
+    }
+    var isTeacherExpanded by remember {
+        mutableStateOf(false)
+    }
+
     AnimatedVisibility(visible = state.isAppInfoDialogOpen) {
         AppInfoDialogBox(onEvent = onEvent)
     }
@@ -72,13 +79,6 @@ fun SettingsScreen(
             )
         }
     ) {
-        val context = LocalContext.current
-        var isGroupExpanded by remember {
-            mutableStateOf(false)
-        }
-        var isTeacherExpanded by remember {
-            mutableStateOf(false)
-        }
         Column(
             modifier = Modifier
                 .padding(horizontal = 20.dp)
@@ -95,7 +95,7 @@ fun SettingsScreen(
             ) {
                 OutlinedTextField(
                     label = {
-                        Text(text = "Group")
+                        Text(text = "Группа")
                     },
                     value = state.selectedGroup,
                     readOnly = true,
@@ -115,7 +115,7 @@ fun SettingsScreen(
                     expanded = isGroupExpanded,
                     onDismissRequest = { isGroupExpanded = false }
                 ) {
-                    state.allGroups.forEach {
+                    state.allGroups.sorted().forEach {
                         DropdownMenuItem(
                             text = {
                                 Text(text = it)
@@ -139,7 +139,7 @@ fun SettingsScreen(
             ) {
                 OutlinedTextField(
                     label = {
-                        Text(text = "Teacher")
+                        Text(text = "Преподаватель")
                     },
                     value = state.selectedTeacher,
                     readOnly = true,
@@ -157,9 +157,10 @@ fun SettingsScreen(
                 )
                 ExposedDropdownMenu(
                     expanded = isTeacherExpanded,
-                    onDismissRequest = { isTeacherExpanded = false }
+                    onDismissRequest = { isTeacherExpanded = false },
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    state.allTeachers.forEach {
+                    state.allTeachers.sorted().forEach {
                         DropdownMenuItem(
                             text = {
                                 Text(text = it)
@@ -167,7 +168,7 @@ fun SettingsScreen(
                             onClick = {
                                 isTeacherExpanded = false
                                 onEvent(SettingsEvent.OnSpecificTeacherClick(it))
-                            }
+                            },
                         )
                     }
                 }
@@ -184,7 +185,7 @@ fun SettingsScreen(
                     color = MaterialTheme.colorScheme.onSecondaryContainer
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                ContactDeveloperRowItem(context = context)
+                ContactDeveloperRowItem()
                 Spacer(modifier = Modifier.height(20.dp))
                 AppInfoRowItem(onEvent = onEvent)
             }

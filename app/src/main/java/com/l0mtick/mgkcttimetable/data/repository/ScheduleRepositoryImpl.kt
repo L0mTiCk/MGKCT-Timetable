@@ -31,30 +31,29 @@ class ScheduleRepositoryImpl(
     private val scheduleApi: ScheduleApi
 ): ScheduleRepository {
     override suspend fun parseTimetable(): MutableMap<String, List<Map<Int, List<String>>>>? {
-//        CoroutineScope(Dispatchers.IO).launch {
-//            val allGroups = scheduleApi.getAllGroupsNumbers().response
-//            delay(500)
-//            Log.d(API_LOG, allGroups.toString())
-//            if (allGroups != null) {
-//                for (group in allGroups) {
-//                    Log.d(API_LOG, scheduleApi.getGroupSchedule(group.toInt()).toString())
-//                }
-//            }
+        Log.d("timetableTest", "Parse timetable")
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val allGroups = scheduleApi.getAllGroupsNumbers().response
+                    delay(500)
+                    Log.d(API_LOG, allGroups.toString())
+                } catch (e: Exception) {
+                    Log.e(API_LOG, e.toString())
+                }
 //            Log.d(API_LOG, scheduleApi.getAllTeacherNames().response.toString())
 //            delay(500)
 //            Log.d(API_LOG, scheduleApi.getTeacherSchedule("Протасеня А. О.").toString())
 //            delay(500)
-//            val groupSchedule = scheduleApi.getGroupSchedule(55)
+//            val groupSchedule = scheduleApi.getGroupSchedule("62")
+//            Log.d(API_LOG, groupSchedule.response.toString())
 //            when (val lessonUnion = groupSchedule.response?.days?.get(2)?.lessons?.get(0)) {
 //                is LessonUnion.LessonClassValue -> Log.d(API_LOG, lessonUnion.value.toString())
 //                is LessonUnion.LessonClassArrayValue -> Log.d(API_LOG, lessonUnion.value.toString())
+//                is LessonUnion.NullValue -> Log.d(API_LOG, "Null lesson")
 //                else -> {}
 //            }
-//        }
-        val schedule = parseRawTimetable()
-        if (schedule != null)
-            saveTimetableToDb(schedule)
-        return schedule
+            }
+        return null
     }
     
     override suspend fun getDbGroupTimetable(mode: Int): List<Map<Int, List<String>>>? {
@@ -79,7 +78,7 @@ class ScheduleRepositoryImpl(
 
     override suspend fun saveTimetableToDb(schedule: MutableMap<String, List<Map<Int, List<String>>>>) {
         for (key in schedule.keys) {
-            CoroutineScope(Dispatchers.IO).async {
+            CoroutineScope(Dispatchers.IO).launch {
                 val existingScheduleEntity = scheduleDao.getScheduleForGroup(key)
                 if (existingScheduleEntity != null) {
                     // Update the existing entity

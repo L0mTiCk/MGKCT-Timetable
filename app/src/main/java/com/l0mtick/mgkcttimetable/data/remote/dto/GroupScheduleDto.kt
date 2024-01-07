@@ -40,16 +40,20 @@ data class GroupDay (
 sealed class LessonUnion {
     class LessonClassArrayValue(val value: List<LessonClass>) : LessonUnion()
     class LessonClassValue(val value: LessonClass)            : LessonUnion()
+    class NullValue()                                         : LessonUnion()
+
 
     public fun toJson(): String = klaxon.toJsonString(when (this) {
         is LessonClassArrayValue -> this.value
         is LessonClassValue      -> this.value
+        is NullValue             -> null
     })
 
     companion object {
         public fun fromJson(jv: JsonValue): LessonUnion = when (jv.inside) {
             is JsonArray<*> -> LessonClassArrayValue(jv.array?.let { klaxon.parseFromJsonArray<LessonClass>(it) }!!)
             is JsonObject   -> LessonClassValue(jv.obj?.let { klaxon.parseFromJsonObject<LessonClass>(it) }!!)
+            null            -> NullValue()
             else            -> throw IllegalArgumentException()
         }
     }
@@ -65,24 +69,25 @@ data class LessonClass (
 )
 
 enum class Type(val value: String) {
-    Лек("Лек"),
-    Лр("ЛР"),
-    Экз("Экз"),
-    Прка("Пр-ка"),
-    Пр("ПР"),
-    Кп("КП"),
-    ФВ("ф-в");
+    Lec("Лек"),
+    Lr("ЛР"),
+    Ex("Экз"),
+    Prka("Пр-ка"),
+    Pr("ПР"),
+    Kp("КП"),
+    Fv("ф-в"),
+    Empty("");
 
     companion object {
         public fun fromValue(value: String): Type = when (value) {
-            "Лек" -> Лек
-            "ЛР"  -> Лр
-            "ф-в" -> ФВ
-            "Экз" -> Экз
-            "Пр-ка" -> Прка
-            "ПР" -> Пр
-            "КП" -> Кп
-            else  -> throw IllegalArgumentException()
+            "Лек" -> Lec
+            "ЛР"  -> Lr
+            "ф-в" -> Fv
+            "Экз" -> Ex
+            "Пр-ка" -> Prka
+            "ПР" -> Pr
+            "КП" -> Kp
+            else  -> Empty
         }
     }
 }

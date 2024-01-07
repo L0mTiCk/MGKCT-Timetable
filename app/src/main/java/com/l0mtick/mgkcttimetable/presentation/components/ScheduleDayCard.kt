@@ -8,13 +8,16 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,6 +31,11 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.l0mtick.mgkcttimetable.data.remote.dto.LessonUnion
+import com.l0mtick.mgkcttimetable.data.remote.dto.Type
+import com.l0mtick.mgkcttimetable.domain.model.schedule.DaySchedule
+import com.l0mtick.mgkcttimetable.domain.model.schedule.Lesson
+import com.l0mtick.mgkcttimetable.domain.model.schedule.ScheduleUnion
 import com.l0mtick.mgkcttimetable.presentation.schedule.ScheduleEvent
 import com.l0mtick.mgkcttimetable.presentation.schedule.ScheduleState
 import java.time.DayOfWeek
@@ -37,8 +45,54 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScheduleDayCard(day: Int, lessons:  List<String>, auditory: List<String>, lessonNumbers: List<String>, state: ScheduleState, onEvent: (ScheduleEvent) -> Unit) {
+fun ScheduleDayCard(
+    state: ScheduleState,
+    onEvent: (ScheduleEvent) -> Unit
+) {
 
+    val daySchedule = DaySchedule(
+        weekday = "Пятница",
+        date = "07.01.2024",
+        lessons = listOf(
+            ScheduleUnion.LessonArrayValue(
+                listOf(
+                    Lesson(
+                        subgroup = 1,
+                        number = 1,
+                        name = "Осн менеджмента",
+                        type = Type.Fv.value,
+                        teacher = "Усикова Л. Н.",
+                        cabinet = "3-114",
+                        comment = "2 часа"
+                    ),
+                    Lesson(
+                        subgroup = 2,
+                        number = 1,
+                        name = "Осн менеджмента",
+                        type = Type.Fv.value,
+                        teacher = "Усикова Л. Н.",
+                        cabinet = "3-114",
+                        comment = "2 часа"
+                    )
+                )
+            ),
+            ScheduleUnion.LessonValue(
+                Lesson(
+                    subgroup = 1,
+                    number = 1,
+                    name = "Осн менеджмента",
+                    type = Type.Fv.value,
+                    teacher = "Усикова Л. Н.",
+                    cabinet = "3-114",
+                    comment = "2 часа"
+                )
+            )
+        )
+    )
+
+    val firstLesson = daySchedule.lessons!![0]
+
+    //TODO: rewrite highlighting of current lesson
     val currentLessonNumber = when (state.currentHour) {
         in 7..10 -> 1
         in 11..12 -> 2
@@ -47,15 +101,9 @@ fun ScheduleDayCard(day: Int, lessons:  List<String>, auditory: List<String>, le
         in 17..19 -> 5
         else -> 0
     }
-
-    val rotationAngle by animateFloatAsState(
-        targetValue = if (state.selectedDay == day + 1) 180f else 0f,
-        label = "Rotate arrow"
-    )
-
     Card(
         onClick = {
-            onEvent(ScheduleEvent.OnSpecificDayClick(day + 1))
+            onEvent(ScheduleEvent.OnSpecificDayClick(daySchedule.date))
         },
         elevation = CardDefaults.elevatedCardElevation(),
         modifier = Modifier
@@ -73,7 +121,7 @@ fun ScheduleDayCard(day: Int, lessons:  List<String>, auditory: List<String>, le
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "TODO:",
+                text = "${daySchedule.date}, ${daySchedule.weekday}",
                 fontSize = 22.sp,
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
                 modifier = Modifier
@@ -82,7 +130,7 @@ fun ScheduleDayCard(day: Int, lessons:  List<String>, auditory: List<String>, le
             )
             IconButton(
                 onClick = {
-                    onEvent(ScheduleEvent.OnSpecificDayClick(day + 1))
+                    onEvent(ScheduleEvent.OnSpecificDayClick(daySchedule.date))
                 },
             ) {
                 Icon(
@@ -90,54 +138,122 @@ fun ScheduleDayCard(day: Int, lessons:  List<String>, auditory: List<String>, le
                     contentDescription = "Arrow",
                     tint = MaterialTheme.colorScheme.onSecondaryContainer,
                     modifier = Modifier
-                        .rotate(rotationAngle)
                 )
             }
         }
-        AnimatedVisibility(visible = state.selectedDay == day + 1) {
+        AnimatedVisibility(visible = state.selectedDay == daySchedule.date) {
+//            Column {
+//                lessons.forEachIndexed { index, s ->
+//                    val backgroundColor by animateColorAsState(
+//                        targetValue = if (lessonNumbers.get(index)
+//                                .toInt() == currentLessonNumber && state.currentDayOfWeek?.value == day + 1
+//                        ) {
+//                            Log.d(
+//                                "timetableTest",
+//                                "selected day - ${state.selectedDay}, card ${day + 1}"
+//                            )
+//                            MaterialTheme.colorScheme.tertiaryContainer
+//                        } else {
+//                            Color.Transparent
+//                        }, label = "Backcolor animation for current lesson",
+//                        animationSpec = tween(durationMillis = 700)
+//                    )
+//                    Row(
+//                        modifier = Modifier
+//                            .background(
+//                                color = backgroundColor,
+//                                shape = RoundedCornerShape(20.dp)
+//                            )
+//                            .padding(horizontal = 20.dp, vertical = 10.dp)
+//                            .fillMaxWidth(),
+//                        verticalAlignment = Alignment.CenterVertically
+//                    ) {
+//                        Text(
+//                            text = "${lessonNumbers.get(index)}.",
+//                            modifier = Modifier
+//                                .padding(end = 10.dp),
+//                            fontSize = 17.sp
+//                        )
+//                        Text(
+//                            text = s.replace(") ", ")\n").replace("2.", "\n2."),
+//                            modifier = Modifier
+//                                .weight(1f)
+//                        )
+//                        Text(
+//                            text = auditory.get(index).replace(" ", "\n"),
+//                        )
+//                    }
+//                }
+//            }
             Column {
-                lessons.forEachIndexed { index, s ->
-                    val backgroundColor by animateColorAsState(
-                        targetValue = if (lessonNumbers.get(index)
-                                .toInt() == currentLessonNumber && state.currentDayOfWeek?.value == day + 1
-                        ) {
-                            Log.d(
-                                "timetableTest",
-                                "selected day - ${state.selectedDay}, card ${day + 1}"
-                            )
-                            MaterialTheme.colorScheme.tertiaryContainer
-                        } else {
-                            Color.Transparent
-                        }, label = "Backcolor animation for current lesson",
-                        animationSpec = tween(durationMillis = 700)
-                    )
+                daySchedule.lessons.forEach { scheduleUnion ->
                     Row(
                         modifier = Modifier
                             .background(
-                                color = backgroundColor,
+                                color = Color.Transparent,
                                 shape = RoundedCornerShape(20.dp)
                             )
                             .padding(horizontal = 20.dp, vertical = 10.dp)
                             .fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = "${lessonNumbers.get(index)}.",
-                            modifier = Modifier
-                                .padding(end = 10.dp),
-                            fontSize = 17.sp
-                        )
-                        Text(
-                            text = s.replace(") ", ")\n").replace("2.", "\n2."),
-                            modifier = Modifier
-                                .weight(1f)
-                        )
-                        Text(
-                            text = auditory.get(index).replace(" ", "\n"),
-                        )
+                        when (scheduleUnion) {
+                            is ScheduleUnion.LessonArrayValue -> {
+                                Text(
+                                    text = scheduleUnion.value[0].number.toString(),
+                                    modifier = Modifier
+                                        .padding(end = 10.dp),
+                                    fontSize = 18.sp
+                                )
+                                Column {
+                                    scheduleUnion.value.forEach { lesson ->
+                                        LessonRow(lesson = lesson)
+                                    }
+                                }
+                            }
+
+                            is ScheduleUnion.LessonValue -> {
+                                Text(
+                                    text = scheduleUnion.value.number.toString(),
+                                    modifier = Modifier
+                                        .padding(end = 10.dp),
+                                    fontSize = 18.sp
+                                )
+                                LessonRow(lesson = scheduleUnion.value)
+                            }
+
+                            null -> TODO()
+                        }
                     }
+//                    Divider(
+//                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 5.dp).fillMaxWidth(),
+//                        thickness = 1.dp,
+//                        color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = .5f)
+//                    )
                 }
             }
         }
+    }
+}
+
+@Composable
+fun LessonRow(lesson: Lesson) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(vertical = 5.dp)
+    ) {
+        val mainString = "${lesson.subgroup ?: ""}. " +
+            lesson.name.toString() +
+                " (${lesson.type ?: ""})" +
+                "\n${lesson.teacher}" +
+                "  ${(lesson.comment ?: "")}"
+        Text(
+            text = mainString,
+            modifier = Modifier
+                .weight(1f)
+        )
+        Text(
+            text = lesson.cabinet ?: "-",
+        )
     }
 }

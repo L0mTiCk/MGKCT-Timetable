@@ -39,7 +39,7 @@ import com.l0mtick.mgkcttimetable.presentation.schedule.ScheduleEvent
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun StudentScheduleScreen(
+fun GroupScheduleScreen(
     scheduleRepository: ScheduleRepository,
     navController: NavController
 ) {
@@ -122,10 +122,6 @@ fun StudentScheduleScreen(
 
                     items(groupLessons.keys.toList()) { key ->
                         ScheduleDayCard(
-                            day = key,
-                            lessons = groupLessons.get(key)!!,
-                            auditory = groupAuditory.get(key)!!,
-                            lessonNumbers = groupLessonNumbers.get(key)!!,
                             state = state,
                             onEvent = onEvent
                         )

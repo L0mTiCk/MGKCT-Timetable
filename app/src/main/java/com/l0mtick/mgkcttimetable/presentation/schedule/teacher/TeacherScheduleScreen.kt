@@ -121,10 +121,6 @@ fun TeacherScheduleScreen(
 
                     items(groupLessons.keys.toList()) { key ->
                         ScheduleDayCard(
-                            day = key,
-                            lessons = groupLessons.get(key)!!,
-                            auditory = groupAuditory.get(key)!!,
-                            lessonNumbers = groupLessonNumbers.get(key)!!,
                             state = state,
                             onEvent = onEvent
                         )

@@ -27,10 +27,10 @@ class GroupScheduleScreenViewModel(private val scheduleRepository: ScheduleRepos
                 viewModelScope.launch {
                     _state.update {
                         it.copy(
-                            selectedDay = if (event.id != _state.value.selectedDay) {
-                                event.id
+                            selectedDay = if (event.date != _state.value.selectedDay) {
+                                event.date
                             } else {
-                                -1
+                                ""
                             },
                         )
                     }
@@ -42,6 +42,7 @@ class GroupScheduleScreenViewModel(private val scheduleRepository: ScheduleRepos
                 viewModelScope.launch {
                     onEvent(ScheduleEvent.OnUpdatingStart)
                     try {
+                        delay(2000)
                         scheduleRepository.parseTimetable()
                     } catch (e: Exception) {
                         Log.d("timetableTest", "${e.message}")
@@ -88,7 +89,9 @@ class GroupScheduleScreenViewModel(private val scheduleRepository: ScheduleRepos
     }
 
     init {
+        //TODO: change this part
         onEvent(ScheduleEvent.UpdateSchedule)
+//        onEvent(ScheduleEvent.OnUpdatingFinished)
         viewModelScope.launch {
             var currentHour = LocalDateTime.now().hour
             var delay = 1000 * 60 * 60 - (LocalDateTime.now().minute) * 60 * 1000L

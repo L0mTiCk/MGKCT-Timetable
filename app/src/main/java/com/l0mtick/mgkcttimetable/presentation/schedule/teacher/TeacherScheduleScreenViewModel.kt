@@ -27,10 +27,10 @@ class TeacherScheduleScreenViewModel(private val scheduleRepository: ScheduleRep
                 viewModelScope.launch {
                     _state.update {
                         it.copy(
-                            selectedDay = if (event.id != _state.value.selectedDay) {
-                                event.id
+                            selectedDay = if (event.date != _state.value.selectedDay) {
+                                event.date
                             } else {
-                                -1
+                                ""
                             },
                         )
                     }

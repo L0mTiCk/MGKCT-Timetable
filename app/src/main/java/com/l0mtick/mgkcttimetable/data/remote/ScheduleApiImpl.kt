@@ -15,7 +15,7 @@ private const val token = "b6xUMDWDrndJ2aIwVekKPX3NoDWfnQaFuKL38ZJ0efNTMw1FNzt4S
 private val client = OkHttpClient()
 
 class ScheduleApiImpl: ScheduleApi {
-    override suspend fun getGroupSchedule(groupNumber: Int): GroupScheduleDto {
+    override suspend fun getGroupSchedule(groupNumber: String): GroupScheduleDto {
         val json = "{\"group\": $groupNumber}"
         val requestBody = json.toRequestBody("application/json".toMediaTypeOrNull())
         val request = Request.Builder()
@@ -32,7 +32,7 @@ class ScheduleApiImpl: ScheduleApi {
                 val schedule = GroupScheduleDto.fromJson(response.body?.string() ?: "")
                 return schedule ?: GroupScheduleDto(null)
             } catch (e: Exception) {
-                Log.e("api_test", "Error while converting group schedule response")
+                Log.e("api_test", "Error while converting group schedule response: ${e}")
             }
         }
         return GroupScheduleDto(response = null)
@@ -51,7 +51,7 @@ class ScheduleApiImpl: ScheduleApi {
             .build()
         val response = client.newCall(request).execute()
         if (response.isSuccessful) {
-            var schedule: TeacherScheduleDto
+            val schedule: TeacherScheduleDto
             try {
                 schedule = TeacherScheduleDto.fromJson(response.body?.string() ?: "")!!
                 return schedule
