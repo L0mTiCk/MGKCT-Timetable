@@ -33,6 +33,7 @@ import androidx.room.Room
 import com.l0mtick.mgkcttimetable.data.database.AppDatabase
 import com.l0mtick.mgkcttimetable.data.remote.ScheduleApiImpl
 import com.l0mtick.mgkcttimetable.data.repository.ScheduleRepositoryImpl
+import com.l0mtick.mgkcttimetable.data.utils.Constants
 import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
 import com.l0mtick.mgkcttimetable.domain.model.NavigationItem
 import com.l0mtick.mgkcttimetable.presentation.schedule.group.GroupScheduleScreen
@@ -84,15 +85,20 @@ class MainActivity : ComponentActivity() {
                                 val currentDestination = navBackStackEntry?.destination
                                 navItems.forEach { screen ->
                                     NavigationBarItem(
+                                        label = { Text(screen.title) },
+                                        selected = currentDestination?.hierarchy?.any { it.route == screen.title.lowercase() } == true,
                                         icon = {
                                             Icon(
-                                                screen.selectedIcon,
+                                                if (currentDestination?.hierarchy?.any { it.route == screen.title.lowercase() } == true) {
+                                                    screen.selectedIcon
+                                                } else {
+                                                    screen.unselectedIcon
+                                                },
                                                 contentDescription = null
                                             )
                                         },
-                                        label = { Text(screen.title) },
-                                        selected = currentDestination?.hierarchy?.any { it.route == screen.title.lowercase() } == true,
                                         onClick = {
+                                            scheduleRepository.saveStartDestinationRoute(screen.title.lowercase())
                                             if (currentDestination?.route.toString() != "settings") {
                                                 navController.navigate(screen.title.lowercase()) {
                                                     // Pop up to the start destination of the graph to

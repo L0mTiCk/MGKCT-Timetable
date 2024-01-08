@@ -13,6 +13,7 @@ import com.l0mtick.mgkcttimetable.data.database.ScheduleEntity
 import com.l0mtick.mgkcttimetable.data.remote.ScheduleApi
 import com.l0mtick.mgkcttimetable.data.remote.mappers.toWeekSchedule
 import com.l0mtick.mgkcttimetable.domain.model.schedule.WeekSchedule
+import com.l0mtick.mgkcttimetable.data.utils.Constants
 import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -104,18 +105,19 @@ class ScheduleRepositoryImpl(
 
     override fun saveGroup(group: String) {
         sharedPreferences.edit().putString(SAVE_GROUP, group).apply()
+
     }
 
     override fun getSavedGroup(): String? {
-        return sharedPreferences.getString(SAVE_GROUP, null)
+        return sharedPreferences.getString(Constants.SAVE_GROUP, null)
     }
 
     override fun saveTeacher(group: String) {
-        sharedPreferences.edit().putString(SAVE_TEACHER, group).apply()
+        sharedPreferences.edit().putString(Constants.SAVE_TEACHER, group).apply()
     }
 
     override fun getSavedTeacher(): String? {
-        return sharedPreferences.getString(SAVE_TEACHER, null)
+        return sharedPreferences.getString(Constants.SAVE_TEACHER, null)
     }
 
     override suspend fun getAllGroupNames(): List<Long>? {
@@ -169,5 +171,13 @@ class ScheduleRepositoryImpl(
         val isMobileConnected =
             networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true
         callback(isMobileConnected || isWifiConnected)
+    }
+
+    override fun saveStartDestinationRoute(route: String) {
+        sharedPreferences.edit().putString(Constants.SAVE_ROUTE, route).apply()
+    }
+
+    override fun getSavedStartDestinationRoute(): String? {
+        return sharedPreferences.getString(Constants.SAVE_ROUTE, "group")
     }
 }
