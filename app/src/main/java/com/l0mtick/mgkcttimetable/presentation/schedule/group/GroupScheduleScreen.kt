@@ -98,7 +98,8 @@ fun GroupScheduleScreen(
                             },
                             actions = {
                                 IconButton(onClick = {
-                                    onEvent(ScheduleEvent.UpdateSchedule)
+                                    if (!state.isScheduleUpdating)
+                                        onEvent(ScheduleEvent.UpdateSchedule)
                                 }) {
                                     Icon(
                                         imageVector = Icons.TwoTone.Refresh,

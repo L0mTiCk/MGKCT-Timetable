@@ -1,5 +1,6 @@
 package com.l0mtick.mgkcttimetable.presentation.schedule.teacher
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
@@ -16,7 +17,7 @@ class TeacherScheduleScreenViewModel(private val scheduleRepository: ScheduleRep
 
     private val _state = MutableStateFlow(
         ScheduleState(
-        selectedGroup = "Никто не выбран"
+        selectedGroup = scheduleRepository.getSavedGroup() ?: "Никто не выбран"
     )
     )
     val state = _state.asStateFlow()
@@ -39,10 +40,19 @@ class TeacherScheduleScreenViewModel(private val scheduleRepository: ScheduleRep
             ScheduleEvent.UpdateSchedule -> {
                 viewModelScope.launch {
                     onEvent(ScheduleEvent.OnUpdatingStart)
+                    try {
+                        _state.update {
+                            it.copy(
+                                selectedGroup = scheduleRepository.getSavedTeacher() ?: "Никто не выбран"
+                            )
+                        }
+                    } catch (e: Exception) {
+                        Log.e("timetableTest", "Error while updating saved teacher: $e")
+                    }
+                    delay(100)
                     _state.update {
                         it.copy(
-                            groupSchedule = scheduleRepository.parseGroupTimetable(_state.value.selectedGroup),
-                            selectedGroup = scheduleRepository.getSavedTeacher() ?: "Никто не выбран"
+                            groupSchedule = scheduleRepository.parseTeacherTimetable(_state.value.selectedGroup),
                         )
                     }
                     onEvent(ScheduleEvent.OnUpdatingFinished)

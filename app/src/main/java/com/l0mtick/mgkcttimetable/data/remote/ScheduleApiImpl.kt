@@ -1,6 +1,7 @@
 package com.l0mtick.mgkcttimetable.data.remote
 
 import android.util.Log
+import androidx.compose.ui.platform.LocalContext
 import com.l0mtick.mgkcttimetable.data.remote.dto.GroupNumbersDto
 import com.l0mtick.mgkcttimetable.data.remote.dto.GroupScheduleDto
 import com.l0mtick.mgkcttimetable.data.remote.dto.TeacherNamesDto
@@ -9,12 +10,13 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.InputStream
+import java.util.Properties
 
 private const val api_url = "https://mgke.keller.by/api"
-private const val token = "b6xUMDWDrndJ2aIwVekKPX3NoDWfnQaFuKL38ZJ0efNTMw1FNzt4SQrJY-Lo-AB0Q1n9xA"
 private val client = OkHttpClient()
 
-class ScheduleApiImpl: ScheduleApi {
+class ScheduleApiImpl(private val token: String = ""): ScheduleApi {
     override suspend fun getGroupSchedule(groupNumber: String): GroupScheduleDto {
         val json = "{\"group\": $groupNumber}"
         val requestBody = json.toRequestBody("application/json".toMediaTypeOrNull())

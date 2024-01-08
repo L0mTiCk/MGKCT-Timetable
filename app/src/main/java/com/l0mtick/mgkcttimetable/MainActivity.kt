@@ -2,6 +2,7 @@ package com.l0mtick.mgkcttimetable
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +22,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -37,22 +39,25 @@ import com.l0mtick.mgkcttimetable.presentation.schedule.group.GroupScheduleScree
 import com.l0mtick.mgkcttimetable.presentation.schedule.teacher.TeacherScheduleScreen
 import com.l0mtick.mgkcttimetable.presentation.settings.SettingsScreen
 import com.l0mtick.mgkcttimetable.ui.theme.MGKCTTimetableTheme
+import java.io.InputStream
+import java.util.Properties
 
 class MainActivity : ComponentActivity() {
-    companion object {
-        lateinit var database: AppDatabase
-    }
+//    companion object {
+//        lateinit var database: AppDatabase
+//    }
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         actionBar?.hide()
-        val api = ScheduleApiImpl()
-        database = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "my-database")
-            .fallbackToDestructiveMigration()
-            .build()
+        val api = ScheduleApiImpl(token = getApiKey())
+//        database = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "my-database")
+//            .fallbackToDestructiveMigration()
+//            .build()
         val sharedPreferences = getSharedPreferences("MGKCT-Timetable", Context.MODE_PRIVATE)
-        val scheduleRepository: ScheduleRepository = ScheduleRepositoryImpl(sharedPreferences, database.scheduleDao(), api)
+        val scheduleRepository: ScheduleRepository =
+            ScheduleRepositoryImpl(sharedPreferences, api)
         val navItems = listOf(
             NavigationItem(
                 title = "Group",
@@ -88,18 +93,20 @@ class MainActivity : ComponentActivity() {
                                         label = { Text(screen.title) },
                                         selected = currentDestination?.hierarchy?.any { it.route == screen.title.lowercase() } == true,
                                         onClick = {
-                                            navController.navigate(screen.title.lowercase()) {
-                                                // Pop up to the start destination of the graph to
-                                                // avoid building up a large stack of destinations
-                                                // on the back stack as users select items
-                                                popUpTo(navController.graph.findStartDestination().id) {
-                                                    saveState = true
+                                            if (currentDestination?.route.toString() != "settings") {
+                                                navController.navigate(screen.title.lowercase()) {
+                                                    // Pop up to the start destination of the graph to
+                                                    // avoid building up a large stack of destinations
+                                                    // on the back stack as users select items
+                                                    popUpTo(navController.graph.findStartDestination().id) {
+                                                        saveState = true
+                                                    }
+                                                    // Avoid multiple copies of the same destination when
+                                                    // reselecting the same item
+                                                    launchSingleTop = true
+                                                    // Restore state when reselecting a previously selected item
+                                                    restoreState = true
                                                 }
-                                                // Avoid multiple copies of the same destination when
-                                                // reselecting the same item
-                                                launchSingleTop = true
-                                                // Restore state when reselecting a previously selected item
-                                                restoreState = true
                                             }
                                         }
                                     )
@@ -107,7 +114,11 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     ) {
-                        NavHost(navController = navController, startDestination = "group", modifier = Modifier.padding(it)) {
+                        NavHost(
+                            navController = navController,
+                            startDestination = "group",
+                            modifier = Modifier.padding(it)
+                        ) {
                             composable("group") {
                                 GroupScheduleScreen(
                                     scheduleRepository = scheduleRepository,
@@ -133,5 +144,12 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    fun getApiKey(): String {
+        val properties = Properties()
+        val inputStream: InputStream = applicationContext.assets.open("config.properties")
+        properties.load(inputStream)
+        return properties.getProperty("api_key")
     }
 }

@@ -8,7 +8,7 @@ data class Lesson(
     val subgroup: Int? = null,
     val name: String? = "",
     val type: String? = "",
-    val teacher: String? = "",
+    val teacher: String? = null,
     val cabinet: String? = null,
     val comment: String? = null
 )

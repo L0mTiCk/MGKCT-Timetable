@@ -17,24 +17,24 @@ import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.internal.wait
 
 private const val SAVE_GROUP = "saved_group"
 private const val SAVE_TEACHER = "saved_teacher"
 private const val API_LOG = "api_test"
 
-//TODO: rewrite to use api instead of parser
 class ScheduleRepositoryImpl(
     private val sharedPreferences: SharedPreferences,
-    private val scheduleDao: ScheduleDao,
+//    private val scheduleDao: ScheduleDao,
     private val scheduleApi: ScheduleApi
-): ScheduleRepository {
+) : ScheduleRepository {
     override suspend fun parseGroupTimetable(groupNumber: String): WeekSchedule {
+        delay(100)
         return withContext(Dispatchers.IO) {
             try {
-                Log.d(API_LOG, "Parse group timetable, group - $groupNumber")
+                Log.d(API_LOG, "Parse group schedule, group - $groupNumber")
                 val result = scheduleApi.getGroupSchedule(groupNumber).toWeekSchedule()
                 Log.d(API_LOG, result.toString())
                 result
@@ -45,54 +45,65 @@ class ScheduleRepositoryImpl(
         }
     }
 
-    //TODO: write mapper for teacherDTO
-    override suspend fun parseTeacherTimetable(groupNumber: String): WeekSchedule {
-        TODO("Not yet implemented")
-    }
-    override suspend fun getDbGroupTimetable(mode: Int): List<Map<Int, List<String>>>? {
-        val groupName = getSavedGroup()
-        val teacherName = getSavedTeacher()
-        when(mode) {
-            0 -> {
-                return if (groupName != null)
-                    scheduleDao.getScheduleForGroup(groupName)?.schedule
-                else
-                    null
+    override suspend fun parseTeacherTimetable(teacher: String): WeekSchedule {
+        delay(200)
+        return withContext(Dispatchers.IO) {
+            try {
+                Log.d(API_LOG, "Parse teacher schedule, teacher - $teacher")
+                val result = scheduleApi.getTeacherSchedule(teacher).toWeekSchedule()
+                Log.d(API_LOG, result.toString())
+                result
+            } catch (e: Exception) {
+                Log.e(API_LOG, e.toString())
+                WeekSchedule(null, "", "")
             }
-            1 -> {
-                return if (teacherName != null)
-                    scheduleDao.getScheduleForGroup(teacherName)?.schedule
-                else
-                    null
-            }
-            else -> return null
         }
     }
 
+    override suspend fun getDbGroupTimetable(mode: Int): List<Map<Int, List<String>>>? {
+//        val groupName = getSavedGroup()
+//        val teacherName = getSavedTeacher()
+//        when (mode) {
+//            0 -> {
+//                return if (groupName != null)
+//                    scheduleDao.getScheduleForGroup(groupName)?.schedule
+//                else
+//                    null
+//            }
+//
+//            1 -> {
+//                return if (teacherName != null)
+//                    scheduleDao.getScheduleForGroup(teacherName)?.schedule
+//                else
+//                    null
+//            }
+//
+//            else -> return null
+//        }
+        return null
+    }
+
     override suspend fun saveTimetableToDb(schedule: MutableMap<String, List<Map<Int, List<String>>>>) {
-        for (key in schedule.keys) {
-            CoroutineScope(Dispatchers.IO).launch {
-                val existingScheduleEntity = scheduleDao.getScheduleForGroup(key)
-                if (existingScheduleEntity != null) {
-                    // Update the existing entity
-                    existingScheduleEntity.schedule = schedule[key]!!
-                    scheduleDao.updateSchedule(existingScheduleEntity)
-                } else {
-                    // Insert a new entity
-                    val newScheduleEntity =
-                        ScheduleEntity(groupName = key, schedule = schedule[key]!!)
-                    scheduleDao.insertSchedule(newScheduleEntity)
-                }
-            }
-        }
+//        for (key in schedule.keys) {
+//            CoroutineScope(Dispatchers.IO).launch {
+//                val existingScheduleEntity = scheduleDao.getScheduleForGroup(key)
+//                if (existingScheduleEntity != null) {
+//                    // Update the existing entity
+//                    existingScheduleEntity.schedule = schedule[key]!!
+//                    scheduleDao.updateSchedule(existingScheduleEntity)
+//                } else {
+//                    // Insert a new entity
+//                    val newScheduleEntity =
+//                        ScheduleEntity(groupName = key, schedule = schedule[key]!!)
+//                    scheduleDao.insertSchedule(newScheduleEntity)
+//                }
+//            }
+//        }
         Log.d("timetable_parser", "Saved to DB")
     }
 
     override fun saveGroup(group: String) {
-        when (group.length) {
-            in 1..6 -> sharedPreferences.edit().putString(SAVE_GROUP, group).apply()
-            else -> sharedPreferences.edit().putString(SAVE_GROUP, group).apply()
-        }
+        sharedPreferences.edit().putString(SAVE_GROUP, group).apply()
     }
 
     override fun getSavedGroup(): String? {
@@ -108,17 +119,25 @@ class ScheduleRepositoryImpl(
     }
 
     override suspend fun getAllGroupNames(): List<Long>? {
-        val a = CoroutineScope(Dispatchers.IO).async {
-         scheduleApi.getAllGroupsNumbers().response
-        }.await()
-        return a
+        return withContext(Dispatchers.IO) {
+            try {
+                scheduleApi.getAllGroupsNumbers().response
+            } catch (e: Exception) {
+                Log.e(API_LOG, "Error while getting all groups: $e")
+                emptyList()
+            }
+        }
     }
 
     override suspend fun getAllTeacherNames(): List<String>? {
-        val a = CoroutineScope(Dispatchers.IO).async {
-            scheduleApi.getAllTeacherNames().response
-        }.await()
-        return a
+        return withContext(Dispatchers.IO) {
+            try {
+                scheduleApi.getAllTeacherNames().response
+            } catch (e: Exception) {
+                Log.e(API_LOG, "Error while getting all teachers: $e")
+                emptyList()
+            }
+        }
     }
 
     override fun getConnectionStatus(context: Context, callback: (Boolean) -> Unit) {
@@ -143,9 +162,12 @@ class ScheduleRepositoryImpl(
             }
         }
         connectivityManager.requestNetwork(networkRequest, networkCallback)
-        val networkCapabilities = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
-        val isWifiConnected = networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
-        val isMobileConnected = networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true
+        val networkCapabilities =
+            connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+        val isWifiConnected =
+            networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
+        val isMobileConnected =
+            networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true
         callback(isMobileConnected || isWifiConnected)
     }
 }

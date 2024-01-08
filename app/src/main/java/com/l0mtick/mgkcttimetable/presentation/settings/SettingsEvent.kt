@@ -7,5 +7,6 @@ sealed interface SettingsEvent {
 
     object OnAppInfoClick: SettingsEvent
     object OnDialogDismiss: SettingsEvent
+    object OnDataUpdate: SettingsEvent
 
 }

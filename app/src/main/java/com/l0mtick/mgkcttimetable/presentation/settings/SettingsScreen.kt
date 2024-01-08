@@ -1,5 +1,6 @@
 package com.l0mtick.mgkcttimetable.presentation.settings
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -114,15 +115,22 @@ fun SettingsScreen(
                     expanded = isGroupExpanded,
                     onDismissRequest = { isGroupExpanded = false }
                 ) {
-                    state.allGroups.sorted().forEach {
+                    if (state.allGroups.isNotEmpty()) {
+                        state.allGroups.sorted().forEach {
+                            DropdownMenuItem(
+                                text = {
+                                    Text(text = it.toString())
+                                },
+                                onClick = {
+                                    isGroupExpanded = false
+                                    onEvent(SettingsEvent.OnSpecificGroupClick(it.toString()))
+                                }
+                            )
+                        }
+                    } else {
                         DropdownMenuItem(
-                            text = {
-                                Text(text = it.toString())
-                            },
-                            onClick = {
-                                isGroupExpanded = false
-                                onEvent(SettingsEvent.OnSpecificGroupClick(it.toString()))
-                            }
+                            text = { Text(text = "Нет данных") },
+                            onClick = { isGroupExpanded = false }
                         )
                     }
                 }
@@ -159,15 +167,22 @@ fun SettingsScreen(
                     onDismissRequest = { isTeacherExpanded = false },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    state.allTeachers.sorted().forEach {
+                    if (state.allTeachers.isNotEmpty()) {
+                        state.allTeachers.sorted().forEach {
+                            DropdownMenuItem(
+                                text = {
+                                    Text(text = it)
+                                },
+                                onClick = {
+                                    isTeacherExpanded = false
+                                    onEvent(SettingsEvent.OnSpecificTeacherClick(it))
+                                },
+                            )
+                        }
+                    } else {
                         DropdownMenuItem(
-                            text = {
-                                Text(text = it)
-                            },
-                            onClick = {
-                                isTeacherExpanded = false
-                                onEvent(SettingsEvent.OnSpecificTeacherClick(it))
-                            },
+                            text = { Text(text = "Нет данных") },
+                            onClick = { isTeacherExpanded = false }
                         )
                     }
                 }
@@ -183,8 +198,8 @@ fun SettingsScreen(
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onSecondaryContainer
                 )
-                Spacer(modifier = Modifier.height(10.dp))
-                ContactDeveloperRowItem()
+//                Spacer(modifier = Modifier.height(10.dp))
+//                ContactDeveloperRowItem()
                 Spacer(modifier = Modifier.height(20.dp))
                 AppInfoRowItem(onEvent = onEvent)
             }

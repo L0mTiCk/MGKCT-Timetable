@@ -142,14 +142,20 @@ fun LessonRow(lesson: Lesson) {
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(vertical = 5.dp)
     ) {
-        val subgroupString = if (lesson.subgroup != null)
+        val subgroupString = if (lesson.subgroup != null) {
             "${lesson.subgroup}. "
-        else
+        } else {
             ""
+        }
+        val teacherString = if (lesson.teacher != null) {
+            "\n${lesson.teacher ?: ""}"
+        } else {
+            ""
+        }
         val mainString = subgroupString +
                 lesson.name.toString() +
                 " (${lesson.type ?: ""})" +
-                "\n${lesson.teacher}" +
+                teacherString +
                 "  ${(lesson.comment ?: "")}"
         Text(
             text = mainString,

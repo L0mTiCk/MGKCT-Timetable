@@ -6,7 +6,7 @@ import com.l0mtick.mgkcttimetable.domain.model.schedule.WeekSchedule
 interface ScheduleRepository {
     suspend fun parseGroupTimetable(groupNumber: String): WeekSchedule
 
-    suspend fun parseTeacherTimetable(groupNumber: String): WeekSchedule
+    suspend fun parseTeacherTimetable(teacher: String): WeekSchedule
 
     suspend fun getDbGroupTimetable(mode: Int): List<Map<Int, List<String>>>?
 

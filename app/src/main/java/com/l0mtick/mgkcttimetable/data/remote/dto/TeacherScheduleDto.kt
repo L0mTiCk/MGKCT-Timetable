@@ -40,5 +40,5 @@ data class Lesson (
     val type: String? = null,
     val group: String? = null,
     val cabinet: String? = null,
-    val comment: Any? = null
+    val comment: String? = null
 )
