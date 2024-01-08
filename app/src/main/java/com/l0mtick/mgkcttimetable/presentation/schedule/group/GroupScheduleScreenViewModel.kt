@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
 import com.l0mtick.mgkcttimetable.presentation.schedule.ScheduleEvent
 import com.l0mtick.mgkcttimetable.presentation.schedule.ScheduleState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -15,7 +16,7 @@ class GroupScheduleScreenViewModel(private val scheduleRepository: ScheduleRepos
 
     private val _state = MutableStateFlow(
         ScheduleState(
-        selectedGroup = "Никто не выбран"
+        selectedGroup = scheduleRepository.getSavedGroup() ?: "Никто не выбран"
     )
     )
     val state = _state.asStateFlow()
@@ -35,19 +36,28 @@ class GroupScheduleScreenViewModel(private val scheduleRepository: ScheduleRepos
                 }
             }
 
-            //TODO: check internet or time, or is local db exist
             ScheduleEvent.UpdateSchedule -> {
                 viewModelScope.launch {
                     onEvent(ScheduleEvent.OnUpdatingStart)
                     try {
                         _state.update {
                             it.copy(
-                                groupSchedule = scheduleRepository.parseGroupTimetable(_state.value.selectedGroup),
                                 selectedGroup = scheduleRepository.getSavedGroup() ?: "Никто не выбран"
                             )
                         }
                     } catch (e: Exception) {
-                        Log.d("timetableTest", "${e.message}")
+                        Log.e("timetableTest", "Error while updating saved group: $e")
+                    }
+                    delay(100)
+                    try {
+                        _state.update {
+                            it.copy(
+                                groupSchedule = scheduleRepository.parseGroupTimetable(_state.value.selectedGroup),
+                            )
+                        }
+                        Log.d("timetableTest", _state.value.groupSchedule.toString())
+                    } catch (e: Exception) {
+                        Log.e("timetableTest", "${e.message}")
                     }
                     onEvent(ScheduleEvent.OnUpdatingFinished)
                 }

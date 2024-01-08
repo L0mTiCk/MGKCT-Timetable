@@ -124,7 +124,10 @@ fun GroupScheduleScreen(
                                 daySchedule = it
                             )
                         }
-                    } else {
+                    }
+                    if (weekSchedule.days?.all {
+                            it.lessons.isNullOrEmpty()
+                        } != false) {
                         item {
                             Column(
                                 modifier = Modifier.fillMaxSize(),
@@ -141,6 +144,7 @@ fun GroupScheduleScreen(
                 }
             }
         }
-        NoConnectionCard(isVisible = !state.isConnected)
     }
+    NoConnectionCard(isVisible = !state.isConnected)
 }
+

@@ -19,6 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.internal.wait
 
 private const val SAVE_GROUP = "saved_group"
 private const val SAVE_TEACHER = "saved_teacher"
@@ -33,6 +34,7 @@ class ScheduleRepositoryImpl(
     override suspend fun parseGroupTimetable(groupNumber: String): WeekSchedule {
         return withContext(Dispatchers.IO) {
             try {
+                Log.d(API_LOG, "Parse group timetable, group - $groupNumber")
                 val result = scheduleApi.getGroupSchedule(groupNumber).toWeekSchedule()
                 Log.d(API_LOG, result.toString())
                 result

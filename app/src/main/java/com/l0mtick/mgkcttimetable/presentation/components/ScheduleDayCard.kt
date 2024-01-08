@@ -40,89 +40,92 @@ fun ScheduleDayCard(
     onEvent: (ScheduleEvent) -> Unit
 ) {
     val rotationAngle by animateFloatAsState(
-        targetValue = if (state.selectedDay == daySchedule.date) 180f else 0f, label = "Arrow rotation"
+        targetValue = if (state.selectedDay == daySchedule.date) 180f else 0f,
+        label = "Arrow rotation"
     )
-    Card(
-        onClick = {
-            Log.w("timetableTest", "Card click!")
-            onEvent(ScheduleEvent.OnSpecificDayClick(daySchedule.date))
-        },
-        elevation = CardDefaults.elevatedCardElevation(),
-        modifier = Modifier
-            .padding(20.dp),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer
-        )
-    ) {
-        Row(
+    if (!daySchedule.lessons.isNullOrEmpty()) {
+        Card(
+            onClick = {
+                Log.w("timetableTest", "Card click!")
+                onEvent(ScheduleEvent.OnSpecificDayClick(daySchedule.date))
+            },
+            elevation = CardDefaults.elevatedCardElevation(),
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 10.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "${daySchedule.date.substringBeforeLast('.')}, ${daySchedule.weekday}",
-                fontSize = 22.sp,
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 10.dp)
+                .padding(20.dp),
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer
             )
-            IconButton(
-                onClick = {
-                    onEvent(ScheduleEvent.OnSpecificDayClick(daySchedule.date))
-                },
-            ) {
-                Icon(
-                    imageVector = Icons.Default.KeyboardArrowDown,
-                    contentDescription = "Arrow",
-                    tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                    modifier = Modifier
-                        .rotate(rotationAngle)
-                )
-            }
-        }
-        AnimatedVisibility(
-            visible = state.selectedDay == daySchedule.date,
         ) {
-            Column {
-                daySchedule.lessons?.forEach { scheduleUnion ->
-                    if (scheduleUnion != null) {
-                        Row(
-                            modifier = Modifier
-                                .background(
-                                    //TODO: return color highlighting for current lesson
-                                    color = Color.Transparent,
-                                    shape = RoundedCornerShape(20.dp)
-                                )
-                                .padding(horizontal = 20.dp, vertical = 10.dp)
-                                .fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            when (scheduleUnion) {
-                                is ScheduleUnion.LessonArrayValue -> {
-                                    Text(
-                                        text = scheduleUnion.value[0].number.toString(),
-                                        modifier = Modifier
-                                            .padding(end = 15.dp),
-                                        fontSize = 18.sp
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp, vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "${daySchedule.date.substringBeforeLast('.')}, ${daySchedule.weekday}",
+                    fontSize = 22.sp,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 10.dp)
+                )
+                IconButton(
+                    onClick = {
+                        onEvent(ScheduleEvent.OnSpecificDayClick(daySchedule.date))
+                    },
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.KeyboardArrowDown,
+                        contentDescription = "Arrow",
+                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                        modifier = Modifier
+                            .rotate(rotationAngle)
+                    )
+                }
+            }
+            AnimatedVisibility(
+                visible = state.selectedDay == daySchedule.date,
+            ) {
+                Column {
+                    daySchedule.lessons?.forEach { scheduleUnion ->
+                        if (scheduleUnion != null) {
+                            Row(
+                                modifier = Modifier
+                                    .background(
+                                        //TODO: return color highlighting for current lesson
+                                        color = Color.Transparent,
+                                        shape = RoundedCornerShape(20.dp)
                                     )
-                                    Column {
-                                        scheduleUnion.value.forEach { lesson ->
-                                            LessonRow(lesson = lesson)
+                                    .padding(horizontal = 20.dp, vertical = 10.dp)
+                                    .fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                when (scheduleUnion) {
+                                    is ScheduleUnion.LessonArrayValue -> {
+                                        Text(
+                                            text = scheduleUnion.value[0].number.toString(),
+                                            modifier = Modifier
+                                                .padding(end = 15.dp),
+                                            fontSize = 18.sp
+                                        )
+                                        Column {
+                                            scheduleUnion.value.forEach { lesson ->
+                                                LessonRow(lesson = lesson)
+                                            }
                                         }
                                     }
-                                }
 
-                                is ScheduleUnion.LessonValue -> {
-                                    Text(
-                                        text = scheduleUnion.value.number.toString(),
-                                        modifier = Modifier
-                                            .padding(end = 15.dp),
-                                        fontSize = 18.sp
-                                    )
-                                    LessonRow(lesson = scheduleUnion.value)
+                                    is ScheduleUnion.LessonValue -> {
+                                        Text(
+                                            text = scheduleUnion.value.number.toString(),
+                                            modifier = Modifier
+                                                .padding(end = 15.dp),
+                                            fontSize = 18.sp
+                                        )
+                                        LessonRow(lesson = scheduleUnion.value)
+                                    }
                                 }
                             }
                         }
