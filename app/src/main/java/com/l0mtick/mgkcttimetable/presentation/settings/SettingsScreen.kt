@@ -1,5 +1,6 @@
 package com.l0mtick.mgkcttimetable.presentation.settings
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -29,7 +30,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -48,6 +48,13 @@ fun SettingsScreen(
     val viewModel: SettingsScreenViewModel = viewModel(factory = viewModelFactory)
     val state = viewModel.state.collectAsState().value
     val onEvent = viewModel::onEvent
+
+    var isGroupExpanded by remember {
+        mutableStateOf(false)
+    }
+    var isTeacherExpanded by remember {
+        mutableStateOf(false)
+    }
 
     AnimatedVisibility(visible = state.isAppInfoDialogOpen) {
         AppInfoDialogBox(onEvent = onEvent)
@@ -72,13 +79,6 @@ fun SettingsScreen(
             )
         }
     ) {
-        val context = LocalContext.current
-        var isGroupExpanded by remember {
-            mutableStateOf(false)
-        }
-        var isTeacherExpanded by remember {
-            mutableStateOf(false)
-        }
         Column(
             modifier = Modifier
                 .padding(horizontal = 20.dp)
@@ -95,7 +95,7 @@ fun SettingsScreen(
             ) {
                 OutlinedTextField(
                     label = {
-                        Text(text = "Group")
+                        Text(text = "Группа")
                     },
                     value = state.selectedGroup,
                     readOnly = true,
@@ -115,15 +115,22 @@ fun SettingsScreen(
                     expanded = isGroupExpanded,
                     onDismissRequest = { isGroupExpanded = false }
                 ) {
-                    state.allGroups.forEach {
+                    if (state.allGroups.isNotEmpty()) {
+                        state.allGroups.sorted().forEach {
+                            DropdownMenuItem(
+                                text = {
+                                    Text(text = it.toString())
+                                },
+                                onClick = {
+                                    isGroupExpanded = false
+                                    onEvent(SettingsEvent.OnSpecificGroupClick(it.toString()))
+                                }
+                            )
+                        }
+                    } else {
                         DropdownMenuItem(
-                            text = {
-                                Text(text = it)
-                            },
-                            onClick = {
-                                isGroupExpanded = false
-                                onEvent(SettingsEvent.OnSpecificGroupClick(it))
-                            }
+                            text = { Text(text = "Нет данных") },
+                            onClick = { isGroupExpanded = false }
                         )
                     }
                 }
@@ -139,7 +146,7 @@ fun SettingsScreen(
             ) {
                 OutlinedTextField(
                     label = {
-                        Text(text = "Teacher")
+                        Text(text = "Преподаватель")
                     },
                     value = state.selectedTeacher,
                     readOnly = true,
@@ -157,17 +164,25 @@ fun SettingsScreen(
                 )
                 ExposedDropdownMenu(
                     expanded = isTeacherExpanded,
-                    onDismissRequest = { isTeacherExpanded = false }
+                    onDismissRequest = { isTeacherExpanded = false },
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    state.allTeachers.forEach {
+                    if (state.allTeachers.isNotEmpty()) {
+                        state.allTeachers.sorted().forEach {
+                            DropdownMenuItem(
+                                text = {
+                                    Text(text = it)
+                                },
+                                onClick = {
+                                    isTeacherExpanded = false
+                                    onEvent(SettingsEvent.OnSpecificTeacherClick(it))
+                                },
+                            )
+                        }
+                    } else {
                         DropdownMenuItem(
-                            text = {
-                                Text(text = it)
-                            },
-                            onClick = {
-                                isTeacherExpanded = false
-                                onEvent(SettingsEvent.OnSpecificTeacherClick(it))
-                            }
+                            text = { Text(text = "Нет данных") },
+                            onClick = { isTeacherExpanded = false }
                         )
                     }
                 }
@@ -183,8 +198,8 @@ fun SettingsScreen(
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onSecondaryContainer
                 )
-                Spacer(modifier = Modifier.height(10.dp))
-                ContactDeveloperRowItem(context = context)
+//                Spacer(modifier = Modifier.height(10.dp))
+//                ContactDeveloperRowItem()
                 Spacer(modifier = Modifier.height(20.dp))
                 AppInfoRowItem(onEvent = onEvent)
             }

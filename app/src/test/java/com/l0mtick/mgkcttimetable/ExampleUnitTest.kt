@@ -1,11 +1,13 @@
 package com.l0mtick.mgkcttimetable
 
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
-import org.junit.Test
+import android.text.format.DateFormat
+import com.l0mtick.mgkcttimetable.domain.model.schedule.Lesson
 import org.junit.Assert.*
+import org.junit.Test
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -19,53 +21,18 @@ class ExampleUnitTest {
     }
 
     @Test
-    fun test_api() {
-        val api_url = "https://mgke.keller.by/api"
+    fun testTimeConvert() {
+        val netDate = Date(1704464681035)
+        val sdf = SimpleDateFormat("dd MMMM HH:mm:ss", Locale.getDefault())
+        val formattedDate = sdf.format(netDate)
+        println(formattedDate)
+    }
 
-        val client = OkHttpClient()
-        val json = "{\"group\": 60}" // Параметры запроса в формате JSON
-        val requestBody = json.toRequestBody("application/json".toMediaTypeOrNull())
-//        val request = Request.Builder()
-//            .url(api_url)
-//            .post(requestBody)
-//            .header(
-//                "Authorization",
-//                "Bearer b6xUMDWDrndJ2aIwVekKPX3NoDWfnQaFuKL38ZJ0efNTMw1FNzt4SQrJY-Lo-AB0Q1n9xA"
-//            )
-//            .build()
-//        val response = client.newCall(request).execute()
-//        println(response.body?.string())
-//        if (response.isSuccessful) {
-//            println("success")
-//            val schedule = GroupResponse.fromJson(response.body?.string() ?: "")
-//            for (day in schedule?.response?.days ?: emptyList()) {
-//                println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-//                println("${day.day} ${day.weekday}")
-//                for (lesson in day.lessons) {
-//                    when(lesson) {
-//                        is LessonUnion.LessonClassValue -> println(lesson.value)
-//                        is LessonUnion.LessonClassArrayValue -> {
-//                            for (lessonClass in lesson.value) {
-//                                println(lessonClass)
-//                            }
-//                        }
-//
-//                        is LessonUnion.NullValue -> {
-//                            println(null)
-//                        }
-//                    }
-//                }
-//            }
-//        }
-        val request = Request.Builder()
-            .url("$api_url/getGroup")
-            .post(requestBody)
-            .header(
-                "Authorization",
-                "Bearer b6xUMDWDrndJ2aIwVekKPX3NoDWfnQaFuKL38ZJ0efNTMw1FNzt4SQrJY-Lo-AB0Q1n9xA"
-            )
-            .build()
-        val response = client.newCall(request).execute()
-        println(response.body?.string())
+    @Test
+    fun nullListElement() {
+        val a = listOf(null, Lesson(), Lesson())
+        a.forEach {
+            println(it)
+        }
     }
 }

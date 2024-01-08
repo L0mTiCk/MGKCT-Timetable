@@ -1,14 +1,15 @@
 package com.l0mtick.mgkcttimetable.presentation.schedule
 
-import java.time.DayOfWeek
+import com.l0mtick.mgkcttimetable.domain.model.schedule.WeekSchedule
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 data class ScheduleState (
     val isConnected: Boolean = true,
-    val currentDayOfWeek: DayOfWeek? = LocalDateTime.now().dayOfWeek,
-    val groupSchedule: List<Map<Int, List<String>>> = listOf(emptyMap(), emptyMap(), emptyMap()),
+    val currentDayOfWeek: String? = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
     val isScheduleUpdating: Boolean = true,
-    val selectedDay: Int = currentDayOfWeek!!.value,
+    val selectedDay: String = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
     val selectedGroup: String = "",
-    val currentHour: Int = LocalDateTime.now().hour
+    val currentHour: Int = LocalDateTime.now().hour,
+    val groupSchedule: WeekSchedule = WeekSchedule(null, "", "")
 )

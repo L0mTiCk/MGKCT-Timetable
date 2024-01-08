@@ -17,7 +17,7 @@ class TeacherScheduleScreenViewModel(private val scheduleRepository: ScheduleRep
 
     private val _state = MutableStateFlow(
         ScheduleState(
-        selectedGroup = "Empty"
+        selectedGroup = scheduleRepository.getSavedGroup() ?: "Никто не выбран"
     )
     )
     val state = _state.asStateFlow()
@@ -27,10 +27,10 @@ class TeacherScheduleScreenViewModel(private val scheduleRepository: ScheduleRep
                 viewModelScope.launch {
                     _state.update {
                         it.copy(
-                            selectedDay = if (event.id != _state.value.selectedDay) {
-                                event.id
+                            selectedDay = if (event.date != _state.value.selectedDay) {
+                                event.date
                             } else {
-                                -1
+                                ""
                             },
                         )
                     }
@@ -40,17 +40,22 @@ class TeacherScheduleScreenViewModel(private val scheduleRepository: ScheduleRep
             ScheduleEvent.UpdateSchedule -> {
                 viewModelScope.launch {
                     onEvent(ScheduleEvent.OnUpdatingStart)
+                    try {
+                        _state.update {
+                            it.copy(
+                                selectedGroup = scheduleRepository.getSavedTeacher() ?: "Никто не выбран"
+                            )
+                        }
+                    } catch (e: Exception) {
+                        Log.e("timetableTest", "Error while updating saved teacher: $e")
+                    }
+                    delay(100)
                     _state.update {
                         it.copy(
-                            groupSchedule = scheduleRepository.getDbGroupTimetable(1) ?: listOf(emptyMap(), emptyMap(), emptyMap()),
-                            selectedGroup = scheduleRepository.getSavedTeacher() ?: "Никто не выбран",
-                            isScheduleUpdating = false
+                            groupSchedule = scheduleRepository.parseTeacherTimetable(_state.value.selectedGroup),
                         )
                     }
                     onEvent(ScheduleEvent.OnUpdatingFinished)
-                    Log.d("timetableTest", "${_state.value.groupSchedule}")
-                    Log.d("timetableTest", "${_state.value.currentDayOfWeek}")
-                    Log.d("timetableTest", "${_state.value.selectedDay}")
                 }
             }
 

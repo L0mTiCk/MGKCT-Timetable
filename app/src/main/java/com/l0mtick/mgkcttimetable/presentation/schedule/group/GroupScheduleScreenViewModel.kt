@@ -11,13 +11,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
 
 class GroupScheduleScreenViewModel(private val scheduleRepository: ScheduleRepository): ViewModel() {
 
     private val _state = MutableStateFlow(
         ScheduleState(
-        selectedGroup = "63"
+        selectedGroup = scheduleRepository.getSavedGroup() ?: "Никто не выбран"
     )
     )
     val state = _state.asStateFlow()
@@ -27,36 +26,40 @@ class GroupScheduleScreenViewModel(private val scheduleRepository: ScheduleRepos
                 viewModelScope.launch {
                     _state.update {
                         it.copy(
-                            selectedDay = if (event.id != _state.value.selectedDay) {
-                                event.id
+                            selectedDay = if (event.date != _state.value.selectedDay) {
+                                event.date
                             } else {
-                                -1
+                                ""
                             },
                         )
                     }
                 }
             }
 
-            //TODO: check internet or time, or is local db exist
             ScheduleEvent.UpdateSchedule -> {
                 viewModelScope.launch {
                     onEvent(ScheduleEvent.OnUpdatingStart)
                     try {
-                        scheduleRepository.parseTimetable()
+                        _state.update {
+                            it.copy(
+                                selectedGroup = scheduleRepository.getSavedGroup() ?: "Никто не выбран"
+                            )
+                        }
                     } catch (e: Exception) {
-                        Log.d("timetableTest", "${e.message}")
+                        Log.e("timetableTest", "Error while updating saved group: $e")
                     }
-                    _state.update {
-                        it.copy(
-                            groupSchedule = scheduleRepository.getDbGroupTimetable(0) ?: listOf(emptyMap(), emptyMap(), emptyMap()),
-                            selectedGroup = scheduleRepository.getSavedGroup() ?: "Никто не выбран",
-                            isScheduleUpdating = false
-                        )
+                    delay(100)
+                    try {
+                        _state.update {
+                            it.copy(
+                                groupSchedule = scheduleRepository.parseGroupTimetable(_state.value.selectedGroup),
+                            )
+                        }
+                        Log.d("timetableTest", _state.value.groupSchedule.toString())
+                    } catch (e: Exception) {
+                        Log.e("timetableTest", "${e.message}")
                     }
                     onEvent(ScheduleEvent.OnUpdatingFinished)
-                    Log.d("timetableTest", "${_state.value.groupSchedule}")
-                    Log.d("timetableTest", "${_state.value.currentDayOfWeek}")
-                    Log.d("timetableTest", "${_state.value.selectedDay}")
                 }
             }
 
@@ -89,17 +92,5 @@ class GroupScheduleScreenViewModel(private val scheduleRepository: ScheduleRepos
 
     init {
         onEvent(ScheduleEvent.UpdateSchedule)
-        viewModelScope.launch {
-            var currentHour = LocalDateTime.now().hour
-            var delay = 1000 * 60 * 60 - (LocalDateTime.now().minute) * 60 * 1000L
-            while (true) {
-                delay(delay)
-                currentHour += 1
-                delay = 1000 * 60 * 60
-                _state.update {
-                    it.copy(currentHour = currentHour)
-                }
-            }
-        }
     }
 }

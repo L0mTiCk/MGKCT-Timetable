@@ -50,7 +50,8 @@ fun TeacherScheduleScreen(
     val state = teacherScheduleScreenViewModel.state.collectAsState().value
     val onEvent = teacherScheduleScreenViewModel::onEvent
     val context = LocalContext.current
-    LaunchedEffect(true) {
+    val weekSchedule = state.groupSchedule
+    LaunchedEffect(Unit) {
         scheduleRepository.getConnectionStatus(
             context = context,
             callback = {
@@ -63,7 +64,8 @@ fun TeacherScheduleScreen(
         ) {
             AnimatedVisibility(
                 visible = state.isScheduleUpdating,
-                enter = fadeIn(animationSpec = tween(200))
+                enter = fadeIn(animationSpec = tween(200)),
+                exit = fadeOut()
             ) {
                 Column(
                     modifier = Modifier.fillMaxSize(),
@@ -86,20 +88,17 @@ fun TeacherScheduleScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = it
                 ) {
-                    val groupLessons = state.groupSchedule.get(0)
-                    val groupAuditory = state.groupSchedule.get(1)
-                    val groupLessonNumbers = state.groupSchedule.get(2)
-
                     stickyHeader {
                         TopAppBar(
                             title = {
                                 Text(
-                                    text = state.selectedGroup.substring(startIndex = state.selectedGroup.indexOf("-") + 1)
+                                    text = state.selectedGroup
                                 )
                             },
                             actions = {
                                 IconButton(onClick = {
-                                    onEvent(ScheduleEvent.UpdateSchedule)
+                                    if (!state.isScheduleUpdating && state.isConnected)
+                                        onEvent(ScheduleEvent.UpdateSchedule)
                                 }) {
                                     Icon(
                                         imageVector = Icons.TwoTone.Refresh,
@@ -117,23 +116,23 @@ fun TeacherScheduleScreen(
                             }
                         )
                     }
-
-                    items(groupLessons.keys.toList()) { key ->
-                        ScheduleDayCard(
-                            day = key,
-                            lessons = groupLessons.get(key)!!,
-                            auditory = groupAuditory.get(key)!!,
-                            lessonNumbers = groupLessonNumbers.get(key)!!,
-                            state = state,
-                            onEvent = onEvent
-                        )
+                    if (weekSchedule.days != null) {
+                        items(state.groupSchedule.days ?: emptyList()) {
+                            ScheduleDayCard(
+                                state = state,
+                                onEvent = onEvent,
+                                daySchedule = it
+                            )
+                        }
                     }
-                    if (groupLessons.isEmpty()) {
+                    if (weekSchedule.days?.all {
+                            it.lessons.isNullOrEmpty()
+                        } != false) {
                         item {
                             Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center,
                                 modifier = Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
                             ) {
                                 Text(
                                     text = "Пар нет",
@@ -144,7 +143,7 @@ fun TeacherScheduleScreen(
                     }
                 }
             }
-            NoConnectionCard(isVisible = !state.isConnected)
         }
+        NoConnectionCard(isVisible = !state.isConnected)
     }
 }

@@ -1,7 +1,7 @@
 package com.l0mtick.mgkcttimetable.presentation.settings
 
 data class SettingsState (
-    val allGroups: List<String> = emptyList(),
+    val allGroups: List<Long> = emptyList(),
     val allTeachers: List<String> = emptyList(),
     val selectedTeacher: String = "",
     val selectedGroup: String = "",

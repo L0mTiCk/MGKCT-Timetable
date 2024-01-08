@@ -1,4 +1,4 @@
-package com.l0mtick.mgkcttimetable.data.remote
+package com.l0mtick.mgkcttimetable.data.remote.dto
 
 import com.beust.klaxon.*
 
@@ -15,7 +15,7 @@ private val klaxon = Klaxon()
     .convert(LessonUnion::class, { LessonUnion.fromJson(it) },    { it.toJson() }, true)
 
 data class GroupScheduleDto (
-    val response: Response
+    val response: GroupResponse? = null
 ) {
     public fun toJson() = klaxon.toJsonString(this)
 
@@ -24,17 +24,17 @@ data class GroupScheduleDto (
     }
 }
 
-data class Response (
-    val days: List<Day>,
-    val update: Long,
-    val changed: Long,
-    val lastSuccess: Boolean
+data class GroupResponse (
+    val days: List<GroupDay>? = null,
+    val update: Long? = null,
+    val changed: Long? = null,
+    val lastSuccess: Boolean? = null
 )
 
-data class Day (
-    val weekday: String,
-    val day: String,
-    val lessons: List<LessonUnion>
+data class GroupDay (
+    val weekday: String? = null,
+    val day: String? = null,
+    val lessons: List<LessonUnion>? = null
 )
 
 sealed class LessonUnion {
@@ -42,10 +42,11 @@ sealed class LessonUnion {
     class LessonClassValue(val value: LessonClass)            : LessonUnion()
     class NullValue()                                         : LessonUnion()
 
+
     public fun toJson(): String = klaxon.toJsonString(when (this) {
         is LessonClassArrayValue -> this.value
-        is LessonClassValue -> this.value
-        is NullValue -> "null"
+        is LessonClassValue      -> this.value
+        is NullValue             -> null
     })
 
     companion object {
@@ -60,24 +61,34 @@ sealed class LessonUnion {
 
 data class LessonClass (
     val subgroup: Long? = null,
-    val lesson: String,
-    val type: Type,
-    val teacher: String,
+    val lesson: String? = null,
+    val type: Type? = null,
+    val teacher: String? = null,
     val cabinet: String? = null,
     val comment: String? = null
 )
 
 enum class Type(val value: String) {
-    Лек("Лек"),
-    Лр("ЛР"),
-    ФВ("ф-в");
+    Lec("Лек"),
+    Lr("ЛР"),
+    Ex("Экз"),
+    Prka("Пр-ка"),
+    Pr("ПР"),
+    Kp("КП"),
+    Fv("ф-в"),
+    Empty("");
 
     companion object {
         public fun fromValue(value: String): Type = when (value) {
-            "Лек" -> Лек
-            "ЛР"  -> Лр
-            "ф-в" -> ФВ
-            else  -> throw IllegalArgumentException()
+            "Лек" -> Lec
+            "ЛР"  -> Lr
+            "ф-в" -> Fv
+            "Экз" -> Ex
+            "Пр-ка" -> Prka
+            "ПР" -> Pr
+            "КП" -> Kp
+            else  -> Empty
         }
     }
 }
+
