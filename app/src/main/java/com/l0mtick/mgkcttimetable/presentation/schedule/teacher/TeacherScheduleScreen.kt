@@ -51,7 +51,7 @@ fun TeacherScheduleScreen(
     val onEvent = teacherScheduleScreenViewModel::onEvent
     val context = LocalContext.current
     val weekSchedule = state.groupSchedule
-    LaunchedEffect(true) {
+    LaunchedEffect(Unit) {
         scheduleRepository.getConnectionStatus(
             context = context,
             callback = {
@@ -97,7 +97,7 @@ fun TeacherScheduleScreen(
                             },
                             actions = {
                                 IconButton(onClick = {
-                                    if (!state.isScheduleUpdating)
+                                    if (!state.isScheduleUpdating && state.isConnected)
                                         onEvent(ScheduleEvent.UpdateSchedule)
                                 }) {
                                     Icon(
@@ -124,7 +124,10 @@ fun TeacherScheduleScreen(
                                 daySchedule = it
                             )
                         }
-                    } else {
+                    }
+                    if (weekSchedule.days?.all {
+                            it.lessons.isNullOrEmpty()
+                        } != false) {
                         item {
                             Column(
                                 modifier = Modifier.fillMaxSize(),

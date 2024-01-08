@@ -51,7 +51,7 @@ fun GroupScheduleScreen(
     val onEvent = groupScheduleScreenViewModel::onEvent
     val context = LocalContext.current
     val weekSchedule = state.groupSchedule
-    LaunchedEffect(true) {
+    LaunchedEffect(Unit) {
         scheduleRepository.getConnectionStatus(
             context = context,
             callback = {
@@ -98,7 +98,7 @@ fun GroupScheduleScreen(
                             },
                             actions = {
                                 IconButton(onClick = {
-                                    if (!state.isScheduleUpdating)
+                                    if (!state.isScheduleUpdating && state.isConnected)
                                         onEvent(ScheduleEvent.UpdateSchedule)
                                 }) {
                                     Icon(

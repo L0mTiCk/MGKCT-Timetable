@@ -89,7 +89,7 @@ fun ScheduleDayCard(
                 visible = state.selectedDay == daySchedule.date,
             ) {
                 Column {
-                    daySchedule.lessons?.forEach { scheduleUnion ->
+                    daySchedule.lessons.forEach { scheduleUnion ->
                         if (scheduleUnion != null) {
                             Row(
                                 modifier = Modifier
@@ -148,15 +148,19 @@ fun LessonRow(lesson: Lesson) {
             ""
         }
         val teacherString = if (lesson.teacher != null) {
-            "\n${lesson.teacher ?: ""}"
+            "\n${lesson.teacher}"
         } else {
             ""
         }
+        val commentString = if (teacherString == "" && !lesson.comment.isNullOrEmpty())
+            "\n${(lesson.comment)}"
+        else
+            "  ${(lesson.comment ?: "")}"
         val mainString = subgroupString +
                 lesson.name.toString() +
                 " (${lesson.type ?: ""})" +
                 teacherString +
-                "  ${(lesson.comment ?: "")}"
+                commentString
         Text(
             text = mainString,
             modifier = Modifier
