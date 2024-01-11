@@ -1,7 +1,9 @@
 package com.l0mtick.mgkcttimetable.presentation.settings
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,7 +38,6 @@ import androidx.navigation.NavController
 import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
 import com.l0mtick.mgkcttimetable.presentation.settings.components.AppInfoDialogBox
 import com.l0mtick.mgkcttimetable.presentation.settings.components.AppInfoRowItem
-import com.l0mtick.mgkcttimetable.presentation.settings.components.ContactDeveloperRowItem
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
@@ -56,7 +57,11 @@ fun SettingsScreen(
         mutableStateOf(false)
     }
 
-    AnimatedVisibility(visible = state.isAppInfoDialogOpen) {
+    AnimatedVisibility(
+        visible = state.isAppInfoDialogOpen,
+        enter = fadeIn(animationSpec = tween(100)),
+        exit = fadeOut(animationSpec = tween(100))
+    ) {
         AppInfoDialogBox(onEvent = onEvent)
     }
 
@@ -116,7 +121,7 @@ fun SettingsScreen(
                     onDismissRequest = { isGroupExpanded = false }
                 ) {
                     if (state.allGroups.isNotEmpty()) {
-                        state.allGroups.sorted().forEach {
+                        state.allGroups.forEach {
                             DropdownMenuItem(
                                 text = {
                                     Text(text = it.toString())
@@ -168,7 +173,7 @@ fun SettingsScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     if (state.allTeachers.isNotEmpty()) {
-                        state.allTeachers.sorted().forEach {
+                        state.allTeachers.forEach {
                             DropdownMenuItem(
                                 text = {
                                     Text(text = it)

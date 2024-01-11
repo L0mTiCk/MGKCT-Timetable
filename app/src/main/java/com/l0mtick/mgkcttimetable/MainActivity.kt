@@ -2,7 +2,6 @@ package com.l0mtick.mgkcttimetable
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,20 +21,19 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.room.Room
-import com.l0mtick.mgkcttimetable.data.database.AppDatabase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.ktx.Firebase
 import com.l0mtick.mgkcttimetable.data.remote.ScheduleApiImpl
 import com.l0mtick.mgkcttimetable.data.repository.ScheduleRepositoryImpl
-import com.l0mtick.mgkcttimetable.data.utils.Constants
-import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
 import com.l0mtick.mgkcttimetable.domain.model.NavigationItem
+import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
 import com.l0mtick.mgkcttimetable.presentation.schedule.group.GroupScheduleScreen
 import com.l0mtick.mgkcttimetable.presentation.schedule.teacher.TeacherScheduleScreen
 import com.l0mtick.mgkcttimetable.presentation.settings.SettingsScreen
@@ -48,10 +46,16 @@ class MainActivity : ComponentActivity() {
 //        lateinit var database: AppDatabase
 //    }
 
+    private lateinit var firebaseAnalytics: FirebaseAnalytics
+
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         actionBar?.hide()
+        firebaseAnalytics = Firebase.analytics
+//        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.APP_OPEN) {
+//            param("test", "test")
+//        }
         val api = ScheduleApiImpl(token = getApiKey())
 //        database = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "my-database")
 //            .fallbackToDestructiveMigration()
@@ -122,7 +126,7 @@ class MainActivity : ComponentActivity() {
                     ) {
                         NavHost(
                             navController = navController,
-                            startDestination = "group",
+                            startDestination = scheduleRepository.getSavedStartDestinationRoute() ?: "group",
                             modifier = Modifier.padding(it)
                         ) {
                             composable("group") {
@@ -152,7 +156,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    fun getApiKey(): String {
+    private fun getApiKey(): String {
         val properties = Properties()
         val inputStream: InputStream = applicationContext.assets.open("config.properties")
         properties.load(inputStream)

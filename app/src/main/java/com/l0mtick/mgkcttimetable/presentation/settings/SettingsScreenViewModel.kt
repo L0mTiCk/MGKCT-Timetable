@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -72,7 +71,6 @@ class SettingsScreenViewModel(private val scheduleRepository: ScheduleRepository
                     try {
                         val groupsDeferred =
                             async(Dispatchers.IO) { scheduleRepository.getAllGroupNames() }
-                        delay(500)
                         val teachersDeferred =
                             async(Dispatchers.IO) { scheduleRepository.getAllTeacherNames() }
 
@@ -80,8 +78,8 @@ class SettingsScreenViewModel(private val scheduleRepository: ScheduleRepository
                         val allTeachers = teachersDeferred.await() ?: emptyList()
                         _state.update {
                             it.copy(
-                                allGroups = allGroups,
-                                allTeachers = allTeachers
+                                allGroups = allGroups.sorted(),
+                                allTeachers = allTeachers.sorted()
                             )
                         }
                     } catch (e: Exception) {

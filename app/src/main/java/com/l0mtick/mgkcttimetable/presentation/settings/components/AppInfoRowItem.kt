@@ -20,6 +20,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.analytics
+import com.google.firebase.analytics.logEvent
 import com.l0mtick.mgkcttimetable.presentation.settings.SettingsEvent
 
 @Composable
@@ -29,6 +32,9 @@ fun AppInfoRowItem(onEvent: (SettingsEvent) -> Unit) {
             .clip(RoundedCornerShape(10.dp))
             .clickable {
                 onEvent(SettingsEvent.OnAppInfoClick)
+                Firebase.analytics.logEvent("about_app_pressed") {
+
+                }
             }
             .padding(5.dp)
     ) {
@@ -56,7 +62,7 @@ fun AppInfoRowItem(onEvent: (SettingsEvent) -> Unit) {
             Spacer(modifier = Modifier.width(15.dp))
             Icon(
                 imageVector = Icons.Outlined.Info,
-                contentDescription = "Mail icon",
+                contentDescription = "Info icon",
                 modifier = Modifier.size(25.dp)
             )
         }
