@@ -26,6 +26,7 @@ interface ScheduleRepository {
 
     fun getConnectionStatus(context: Context, callback: (Boolean) -> Unit)
 
+    fun unsubscribeConnectionStatus()
     fun saveStartDestinationRoute(route: String)
 
     fun getSavedStartDestinationRoute(): String?

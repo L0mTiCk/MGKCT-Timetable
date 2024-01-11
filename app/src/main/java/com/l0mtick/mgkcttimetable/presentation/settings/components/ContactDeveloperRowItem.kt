@@ -23,6 +23,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.analytics
+import com.google.firebase.analytics.logEvent
 
 @Composable
 fun ContactDeveloperRowItem() {
@@ -30,7 +33,11 @@ fun ContactDeveloperRowItem() {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(10.dp))
+            //TODO: rework contact method
             .clickable {
+                Firebase.analytics.logEvent("contact_dev_pressed") {
+
+                }
                 val emailIntent = Intent(Intent.ACTION_SEND)
                 emailIntent.type = "text/plain"
                 emailIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf("blashkoaleksej@duck.com"))
