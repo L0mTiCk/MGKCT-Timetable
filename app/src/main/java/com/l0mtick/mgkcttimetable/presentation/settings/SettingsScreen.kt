@@ -1,5 +1,6 @@
 package com.l0mtick.mgkcttimetable.presentation.settings
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -7,39 +8,33 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.twotone.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Divider
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.l0mtick.mgkcttimetable.R
 import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
 import com.l0mtick.mgkcttimetable.presentation.settings.components.AppInfoDialogBox
-import com.l0mtick.mgkcttimetable.presentation.settings.components.AppInfoRowItem
+import com.l0mtick.mgkcttimetable.presentation.settings.components.other.AppInfoRowItem
+import com.l0mtick.mgkcttimetable.presentation.settings.components.other.NotificationRowItem
+import com.l0mtick.mgkcttimetable.presentation.settings.components.OutlinedSelector
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     repository: ScheduleRepository,
@@ -49,13 +44,6 @@ fun SettingsScreen(
     val viewModel: SettingsScreenViewModel = viewModel(factory = viewModelFactory)
     val state = viewModel.state.collectAsState().value
     val onEvent = viewModel::onEvent
-
-    var isGroupExpanded by remember {
-        mutableStateOf(false)
-    }
-    var isTeacherExpanded by remember {
-        mutableStateOf(false)
-    }
 
     AnimatedVisibility(
         visible = state.isAppInfoDialogOpen,
@@ -68,11 +56,21 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(text = "Settings") },
+                title = { Text(text = stringResource(id = R.string.settings_header)) },
                 navigationIcon = {
                     IconButton(
                         onClick = {
-                            navController.popBackStack()
+                            try {
+                                val previousRoute =
+                                    navController.previousBackStackEntry?.destination?.route
+                                navController.navigate(route = previousRoute ?: throw IllegalArgumentException()) {
+                                    popUpTo(route = previousRoute) {
+                                        inclusive = true
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                Log.e("timetableTest", "Error while navigating from settings")
+                            }
                         }
                     ) {
                         Icon(
@@ -86,112 +84,13 @@ fun SettingsScreen(
     ) {
         Column(
             modifier = Modifier
-                .padding(horizontal = 20.dp)
+                .padding(horizontal = 20.dp, vertical = it.calculateTopPadding())
                 .fillMaxSize()
         ) {
-            ExposedDropdownMenuBox(
-                expanded = isGroupExpanded,
-                onExpandedChange = {
-                    isGroupExpanded = it
-                },
-                modifier = Modifier
-                    .padding(top = it.calculateTopPadding())
-                    .fillMaxWidth()
-            ) {
-                OutlinedTextField(
-                    label = {
-                        Text(text = "Группа")
-                    },
-                    value = state.selectedGroup,
-                    readOnly = true,
-                    enabled = false,
-                    onValueChange = {},
-                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(
-                        disabledBorderColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                        disabledPlaceholderColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                        disabledLabelColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                        disabledTextColor = MaterialTheme.colorScheme.onSecondaryContainer
-                    ),
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth(),
-                )
-                ExposedDropdownMenu(
-                    expanded = isGroupExpanded,
-                    onDismissRequest = { isGroupExpanded = false }
-                ) {
-                    if (state.allGroups.isNotEmpty()) {
-                        state.allGroups.forEach {
-                            DropdownMenuItem(
-                                text = {
-                                    Text(text = it.toString())
-                                },
-                                onClick = {
-                                    isGroupExpanded = false
-                                    onEvent(SettingsEvent.OnSpecificGroupClick(it.toString()))
-                                }
-                            )
-                        }
-                    } else {
-                        DropdownMenuItem(
-                            text = { Text(text = "Нет данных") },
-                            onClick = { isGroupExpanded = false }
-                        )
-                    }
-                }
-            }
-            ExposedDropdownMenuBox(
-                expanded = isTeacherExpanded,
-                onExpandedChange = {
-                    isTeacherExpanded = it
-                },
-                modifier = Modifier
-                    .padding(top = 20.dp)
-                    .fillMaxWidth()
-            ) {
-                OutlinedTextField(
-                    label = {
-                        Text(text = "Преподаватель")
-                    },
-                    value = state.selectedTeacher,
-                    readOnly = true,
-                    enabled = false,
-                    onValueChange = {},
-                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(
-                        disabledBorderColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                        disabledPlaceholderColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                        disabledLabelColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                        disabledTextColor = MaterialTheme.colorScheme.onSecondaryContainer
-                    ),
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth(),
-                )
-                ExposedDropdownMenu(
-                    expanded = isTeacherExpanded,
-                    onDismissRequest = { isTeacherExpanded = false },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    if (state.allTeachers.isNotEmpty()) {
-                        state.allTeachers.forEach {
-                            DropdownMenuItem(
-                                text = {
-                                    Text(text = it)
-                                },
-                                onClick = {
-                                    isTeacherExpanded = false
-                                    onEvent(SettingsEvent.OnSpecificTeacherClick(it))
-                                },
-                            )
-                        }
-                    } else {
-                        DropdownMenuItem(
-                            text = { Text(text = "Нет данных") },
-                            onClick = { isTeacherExpanded = false }
-                        )
-                    }
-                }
-            }
+            OutlinedSelector(label = stringResource(id = R.string.navigation_group), value = state.selectedGroup,
+                elements = state.allGroups, onEvent = onEvent)
+            OutlinedSelector(label = stringResource(id = R.string.navigation_teacher), value = state.selectedTeacher,
+                elements = state.allTeachers, onEvent = onEvent)
             Divider(
                 modifier = Modifier.padding(top = 30.dp)
             )
@@ -199,13 +98,15 @@ fun SettingsScreen(
                 modifier = Modifier.padding(vertical = 20.dp)
             ) {
                 Text(
-                    text = "Прочее",
+                    text = stringResource(id = R.string.settings_other),
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onSecondaryContainer
                 )
 //                Spacer(modifier = Modifier.height(10.dp))
 //                ContactDeveloperRowItem()
                 Spacer(modifier = Modifier.height(20.dp))
+                NotificationRowItem(isAllowed = state.isNotificationsEnabled, onEvent = onEvent)
+                Spacer(modifier = Modifier.height(10.dp))
                 AppInfoRowItem(onEvent = onEvent)
             }
         }

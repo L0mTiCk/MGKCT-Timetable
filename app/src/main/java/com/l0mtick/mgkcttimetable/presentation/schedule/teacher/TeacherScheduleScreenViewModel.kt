@@ -17,7 +17,7 @@ class TeacherScheduleScreenViewModel(private val scheduleRepository: ScheduleRep
 
     private val _state = MutableStateFlow(
         ScheduleState(
-        selectedGroup = scheduleRepository.getSavedGroup() ?: "Никто не выбран"
+        selectedGroup = scheduleRepository.getSavedGroup() ?: scheduleRepository.getEmptySelectedString()
     )
     )
     val state = _state.asStateFlow()

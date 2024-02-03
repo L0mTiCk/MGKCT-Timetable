@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Timetable</string>
+    <string name="notification_dialog_header">Уведомления</string>
+    <string name="proceed_text">Продолжить</string>
+    <string name="notification_dialog_main">Сейчас будет запрошено разрешение на отображение уведомлений.\n\nОно будет использоваться для оповещения об обновлениях расписания.\n\nВключить/отключить уведомления всегда можно в настройках.</string>
+    <string name="navigation_group">Группа</string>
+    <string name="navigation_teacher">Преподаватель</string>
+    <string name="screen_no_group">Не выбрано</string>
+    <string name="screen_group_title">Группа</string>
+    <string name="screen_no_lessons">Пар нет</string>
+    <string name="settings_header">Настройки</string>
+    <string name="settings_about_title">О приложении</string>
+    <string name="settings_about_main">Информация о данном приложении</string>
+    <string name="settings_notification_title">Уведомления</string>
+    <string name="settings_notification_main">Включение/отключение уведомлений</string>
+    <string name="settings_language_title">Язык</string>
+    <string name="settings_language_main">Изменение языка приложения</string>
+    <string name="settings_other">Прочее</string>
+    <string name="toast_notifications">Предоставьте разрешение в настройках</string>
+</resources>

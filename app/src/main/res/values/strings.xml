@@ -1,3 +1,20 @@
 <resources>
     <string name="app_name">Timetable</string>
+    <string name="notification_dialog_header">Notifications</string>
+    <string name="proceed_text">Proceed</string>
+    <string name="notification_dialog_main">You will now be asked for permission to display notifications. \n\nIt will be used to notify about schedule updates. \n\nYou can always enable/disable notifications in the settings.</string>
+    <string name="navigation_group">Group</string>
+    <string name="navigation_teacher">Teacher</string>
+    <string name="screen_no_group">Not selected</string>
+    <string name="screen_group_title">Group</string>
+    <string name="screen_no_lessons">Empty</string>
+    <string name="settings_header">Settings</string>
+    <string name="settings_about_title">About app</string>
+    <string name="settings_about_main">Information about this application</string>
+    <string name="settings_notification_title">Notifications</string>
+    <string name="settings_notification_main">Enable/disable notifications</string>
+    <string name="settings_language_title">Language</string>
+    <string name="settings_language_main">Changе application language</string>
+    <string name="settings_other">Other</string>
+    <string name="toast_notifications">Grant permission in the settings</string>
 </resources>

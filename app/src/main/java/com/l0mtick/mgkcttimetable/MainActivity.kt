@@ -1,6 +1,9 @@
 package com.l0mtick.mgkcttimetable
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -20,7 +23,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -32,8 +40,10 @@ import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
 import com.l0mtick.mgkcttimetable.data.remote.ScheduleApiImpl
 import com.l0mtick.mgkcttimetable.data.repository.ScheduleRepositoryImpl
+import com.l0mtick.mgkcttimetable.data.utils.Constants
 import com.l0mtick.mgkcttimetable.domain.model.NavigationItem
 import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
+import com.l0mtick.mgkcttimetable.presentation.components.NotificationDialog
 import com.l0mtick.mgkcttimetable.presentation.schedule.group.GroupScheduleScreen
 import com.l0mtick.mgkcttimetable.presentation.schedule.teacher.TeacherScheduleScreen
 import com.l0mtick.mgkcttimetable.presentation.settings.SettingsScreen
@@ -53,24 +63,22 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         actionBar?.hide()
         firebaseAnalytics = Firebase.analytics
-//        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.APP_OPEN) {
-//            param("test", "test")
-//        }
         val api = ScheduleApiImpl(token = getApiKey())
 //        database = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "my-database")
 //            .fallbackToDestructiveMigration()
 //            .build()
-        val sharedPreferences = getSharedPreferences("MGKCT-Timetable", Context.MODE_PRIVATE)
+        val sharedPreferences = getSharedPreferences(Constants.SHARED_PREF_NAME, Context.MODE_PRIVATE)
         val scheduleRepository: ScheduleRepository =
-            ScheduleRepositoryImpl(sharedPreferences, api)
+            ScheduleRepositoryImpl(activity = this, sharedPreferences = sharedPreferences, scheduleApi = api)
+        val isNotificationRequestRequired = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
         val navItems = listOf(
             NavigationItem(
-                title = "Group",
+                title = getString(R.string.navigation_group),
                 selectedIcon = Icons.Filled.List,
                 unselectedIcon = Icons.Outlined.List,
             ),
             NavigationItem(
-                title = "Teacher",
+                title = getString(R.string.navigation_teacher),
                 selectedIcon = Icons.Filled.Person,
                 unselectedIcon = Icons.Outlined.Person,
             )
@@ -81,6 +89,17 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    var isFirstLaunch by remember {
+                        mutableStateOf(sharedPreferences.getBoolean(Constants.IS_FIRST_LAUNCH, true))
+                    }
+                    if (isFirstLaunch && isNotificationRequestRequired) {
+                        NotificationDialog(onDismiss = {
+                            sharedPreferences.edit().putBoolean(Constants.IS_FIRST_LAUNCH, false)
+                                .apply()
+                            isFirstLaunch = false
+                            requestNotificationPermission()
+                        })
+                    }
                     val navController = rememberNavController()
                     Scaffold(
                         bottomBar = {
@@ -156,7 +175,23 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun getApiKey(): String {
+    private fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+            val hasPermission = ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+            if (!hasPermission){
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                    0
+                )
+            }
+        }
+    }
+
+    fun getApiKey(): String {
         val properties = Properties()
         val inputStream: InputStream = applicationContext.assets.open("config.properties")
         properties.load(inputStream)

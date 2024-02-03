@@ -1,4 +1,4 @@
-package com.l0mtick.mgkcttimetable.presentation.settings.components
+package com.l0mtick.mgkcttimetable.presentation.settings.components.other
 
 import android.content.Intent
 import androidx.compose.foundation.clickable

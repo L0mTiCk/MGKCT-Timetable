@@ -18,6 +18,8 @@ private val client = OkHttpClient()
 
 class ScheduleApiImpl(private val token: String = ""): ScheduleApi {
     override suspend fun getGroupSchedule(groupNumber: String): GroupScheduleDto {
+        if (checkRequestBody(groupNumber))
+            return GroupScheduleDto(null)
         val json = "{\"group\": $groupNumber}"
         val requestBody = json.toRequestBody("application/json".toMediaTypeOrNull())
         val request = Request.Builder()
@@ -41,6 +43,8 @@ class ScheduleApiImpl(private val token: String = ""): ScheduleApi {
     }
 
     override suspend fun getTeacherSchedule(teacher: String): TeacherScheduleDto {
+        if (checkRequestBody(teacher))
+            return TeacherScheduleDto(null)
         val json = "{\"teacher\": \"$teacher\"}"
         val requestBody = json.toRequestBody("application/json".toMediaTypeOrNull())
         val request = Request.Builder()
@@ -100,5 +104,9 @@ class ScheduleApiImpl(private val token: String = ""): ScheduleApi {
             }
         }
         return TeacherNamesDto(response = null)
+    }
+
+    private fun checkRequestBody(string: String): Boolean {
+        return string.contentEquals("Никто не выбран")
     }
 }
