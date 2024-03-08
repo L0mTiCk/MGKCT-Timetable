@@ -1,4 +1,4 @@
-package com.l0mtick.mgkcttimetable.data.remote
+package com.l0mtick.mgkcttimetable.domain.repository
 
 import com.l0mtick.mgkcttimetable.data.remote.dto.GroupNumbersDto
 import com.l0mtick.mgkcttimetable.data.remote.dto.GroupScheduleDto

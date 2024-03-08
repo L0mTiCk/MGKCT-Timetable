@@ -65,7 +65,7 @@ dependencies {
     implementation(platform("androidx.compose:compose-bom:2023.03.00"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
-    implementation("androidx.compose.ui:ui-tooling-preview:1.6.0-alpha01")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.6.3")
     implementation("androidx.compose.material3:material3")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
@@ -96,11 +96,9 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.0.1")
 
     //firebase
-    implementation(platform("com.google.firebase:firebase-bom:32.6.0"))
+    implementation(platform("com.google.firebase:firebase-bom:32.7.4"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-perf")
     implementation("com.google.firebase:firebase-messaging")
-    //worker
-    implementation("androidx.work:work-runtime-ktx:$work_version")
 }

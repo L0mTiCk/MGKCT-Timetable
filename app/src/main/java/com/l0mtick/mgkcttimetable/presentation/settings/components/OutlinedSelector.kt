@@ -22,7 +22,7 @@ import com.l0mtick.mgkcttimetable.presentation.settings.SettingsEvent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OutlinedSelector(label: String, value: String, elements: List<Any>, onEvent: (SettingsEvent) -> Unit) {
+fun OutlinedSelector(label: String, value: String, elements: List<Any>, onEvent: (String) -> Unit) {
     var isExpanded by remember {
         mutableStateOf(false)
     }
@@ -66,7 +66,7 @@ fun OutlinedSelector(label: String, value: String, elements: List<Any>, onEvent:
                         },
                         onClick = {
                             isExpanded = false
-                            onEvent(SettingsEvent.OnSpecificTeacherClick(it.toString()))
+                            onEvent(it.toString())
                         },
                     )
                 }

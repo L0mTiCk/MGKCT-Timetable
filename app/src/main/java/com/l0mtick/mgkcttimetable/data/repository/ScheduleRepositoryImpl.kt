@@ -17,7 +17,7 @@ import androidx.core.content.ContextCompat
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.ktx.messaging
 import com.l0mtick.mgkcttimetable.R
-import com.l0mtick.mgkcttimetable.data.remote.ScheduleApi
+import com.l0mtick.mgkcttimetable.domain.repository.ScheduleApi
 import com.l0mtick.mgkcttimetable.data.remote.mappers.toWeekSchedule
 import com.l0mtick.mgkcttimetable.data.utils.Constants
 import com.l0mtick.mgkcttimetable.domain.model.schedule.WeekSchedule
@@ -73,45 +73,11 @@ class ScheduleRepositoryImpl(
     }
 
     override suspend fun getDbGroupTimetable(mode: Int): List<Map<Int, List<String>>>? {
-//        val groupName = getSavedGroup()
-//        val teacherName = getSavedTeacher()
-//        when (mode) {
-//            0 -> {
-//                return if (groupName != null)
-//                    scheduleDao.getScheduleForGroup(groupName)?.schedule
-//                else
-//                    null
-//            }
-//
-//            1 -> {
-//                return if (teacherName != null)
-//                    scheduleDao.getScheduleForGroup(teacherName)?.schedule
-//                else
-//                    null
-//            }
-//
-//            else -> return null
-//        }
-        return null
+        TODO("Not yet implemented")
     }
 
     override suspend fun saveTimetableToDb(schedule: MutableMap<String, List<Map<Int, List<String>>>>) {
-//        for (key in schedule.keys) {
-//            CoroutineScope(Dispatchers.IO).launch {
-//                val existingScheduleEntity = scheduleDao.getScheduleForGroup(key)
-//                if (existingScheduleEntity != null) {
-//                    // Update the existing entity
-//                    existingScheduleEntity.schedule = schedule[key]!!
-//                    scheduleDao.updateSchedule(existingScheduleEntity)
-//                } else {
-//                    // Insert a new entity
-//                    val newScheduleEntity =
-//                        ScheduleEntity(groupName = key, schedule = schedule[key]!!)
-//                    scheduleDao.insertSchedule(newScheduleEntity)
-//                }
-//            }
-//        }
-        Log.d("timetable_parser", "Saved to DB")
+        TODO("Not yet implemented")
     }
 
     override fun saveGroup(group: String) {

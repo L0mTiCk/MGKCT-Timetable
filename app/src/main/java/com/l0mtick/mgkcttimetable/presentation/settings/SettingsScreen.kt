@@ -44,6 +44,13 @@ fun SettingsScreen(
     val viewModel: SettingsScreenViewModel = viewModel(factory = viewModelFactory)
     val state = viewModel.state.collectAsState().value
     val onEvent = viewModel::onEvent
+    val onGroupEvent: (String) -> Unit = { groupName ->
+        viewModel.onEvent(SettingsEvent.OnSpecificGroupClick(groupName))
+    }
+
+    val onTeacherEvent: (String) -> Unit = { teacherName ->
+        viewModel.onEvent(SettingsEvent.OnSpecificTeacherClick(teacherName))
+    }
 
     AnimatedVisibility(
         visible = state.isAppInfoDialogOpen,
@@ -88,9 +95,9 @@ fun SettingsScreen(
                 .fillMaxSize()
         ) {
             OutlinedSelector(label = stringResource(id = R.string.navigation_group), value = state.selectedGroup,
-                elements = state.allGroups, onEvent = onEvent)
+                elements = state.allGroups, onEvent = onGroupEvent)
             OutlinedSelector(label = stringResource(id = R.string.navigation_teacher), value = state.selectedTeacher,
-                elements = state.allTeachers, onEvent = onEvent)
+                elements = state.allTeachers, onEvent = onTeacherEvent)
             Divider(
                 modifier = Modifier.padding(top = 30.dp)
             )
