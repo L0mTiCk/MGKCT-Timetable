@@ -6,5 +6,6 @@ data class SettingsState (
     val selectedTeacher: String = "",
     val selectedGroup: String = "",
     val isGroupMenuExpanded: Boolean = false,
-    val isAppInfoDialogOpen: Boolean = false
+    val isAppInfoDialogOpen: Boolean = false,
+    val isNotificationsEnabled: Boolean,
 )

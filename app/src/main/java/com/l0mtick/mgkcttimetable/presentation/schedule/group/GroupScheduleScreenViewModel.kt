@@ -16,8 +16,8 @@ class GroupScheduleScreenViewModel(private val scheduleRepository: ScheduleRepos
 
     private val _state = MutableStateFlow(
         ScheduleState(
-        selectedGroup = scheduleRepository.getSavedGroup() ?: "Никто не выбран"
-    )
+            selectedGroup = scheduleRepository.getSavedGroup() ?: scheduleRepository.getEmptySelectedString()
+        )
     )
     val state = _state.asStateFlow()
     fun onEvent(event: ScheduleEvent) {
@@ -42,7 +42,7 @@ class GroupScheduleScreenViewModel(private val scheduleRepository: ScheduleRepos
                     try {
                         _state.update {
                             it.copy(
-                                selectedGroup = scheduleRepository.getSavedGroup() ?: "Никто не выбран"
+                                selectedGroup = scheduleRepository.getSavedGroup() ?: scheduleRepository.getEmptySelectedString()
                             )
                         }
                     } catch (e: Exception) {
@@ -70,6 +70,7 @@ class GroupScheduleScreenViewModel(private val scheduleRepository: ScheduleRepos
                     }
                 }
             }
+
             ScheduleEvent.OnUpdatingStart -> {
                 viewModelScope.launch {
                     _state.update {

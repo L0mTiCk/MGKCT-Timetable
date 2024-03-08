@@ -1,4 +1,4 @@
-package com.l0mtick.mgkcttimetable.presentation.settings.components
+package com.l0mtick.mgkcttimetable.presentation.settings.components.other
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -19,10 +19,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
 import com.google.firebase.analytics.logEvent
+import com.l0mtick.mgkcttimetable.R
 import com.l0mtick.mgkcttimetable.presentation.settings.SettingsEvent
 
 @Composable
@@ -48,12 +50,12 @@ fun AppInfoRowItem(onEvent: (SettingsEvent) -> Unit) {
             ) {
                 Column {
                     Text(
-                        text = "О приложении",
+                        text = stringResource(id = R.string.settings_about_title),
                         style = MaterialTheme.typography.titleMedium
                     )
                     Spacer(modifier = Modifier.height(5.dp))
                     Text(
-                        text = "Получение информации о данном приложении.",
+                        text = stringResource(id = R.string.settings_about_main),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = .8f)
                     )

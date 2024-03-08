@@ -16,7 +16,8 @@ class SettingsScreenViewModel(private val scheduleRepository: ScheduleRepository
     private val _state = MutableStateFlow(
         SettingsState(
             selectedGroup = scheduleRepository.getSavedGroup() ?: "",
-            selectedTeacher = scheduleRepository.getSavedTeacher() ?: ""
+            selectedTeacher = scheduleRepository.getSavedTeacher() ?: "",
+            isNotificationsEnabled = scheduleRepository.getNotificationPermissionStatus()
         )
     )
 
@@ -73,17 +74,37 @@ class SettingsScreenViewModel(private val scheduleRepository: ScheduleRepository
                             async(Dispatchers.IO) { scheduleRepository.getAllGroupNames() }
                         val teachersDeferred =
                             async(Dispatchers.IO) { scheduleRepository.getAllTeacherNames() }
-
                         val allGroups = groupsDeferred.await() ?: emptyList()
                         val allTeachers = teachersDeferred.await() ?: emptyList()
                         _state.update {
                             it.copy(
                                 allGroups = allGroups.sorted(),
-                                allTeachers = allTeachers.sorted()
+                                allTeachers = allTeachers.sorted(),
                             )
                         }
                     } catch (e: Exception) {
                         Log.e("timetableTest", e.toString())
+                    }
+                }
+            }
+
+            SettingsEvent.OnNotificationClick -> {
+                if (_state.value.isNotificationsEnabled) {
+                    viewModelScope.launch {
+                        _state.update {
+                            it.copy(
+                                isNotificationsEnabled = false
+                            )
+                        }
+                        scheduleRepository.disableNotifications()
+                    }
+                } else {
+                    viewModelScope.launch {
+                        _state.update {
+                            it.copy(
+                                isNotificationsEnabled = scheduleRepository.enableNotifications()
+                            )
+                        }
                     }
                 }
             }

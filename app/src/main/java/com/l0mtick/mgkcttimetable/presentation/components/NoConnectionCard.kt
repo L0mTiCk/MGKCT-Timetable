@@ -2,6 +2,7 @@ package com.l0mtick.mgkcttimetable.presentation.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,6 +24,7 @@ fun NoConnectionCard(isVisible: Boolean) {
     AnimatedVisibility(
         visible = isVisible,
         enter = slideInVertically { -it },
+        exit = slideOutVertically { -it }
     ) {
         Column(
             modifier = Modifier

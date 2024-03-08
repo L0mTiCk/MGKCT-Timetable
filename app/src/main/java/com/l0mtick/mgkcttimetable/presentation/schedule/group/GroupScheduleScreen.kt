@@ -29,11 +29,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.l0mtick.mgkcttimetable.R
 import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
 import com.l0mtick.mgkcttimetable.presentation.components.NoConnectionCard
+import com.l0mtick.mgkcttimetable.presentation.components.NoLessonsCard
 import com.l0mtick.mgkcttimetable.presentation.components.ScheduleDayCard
 import com.l0mtick.mgkcttimetable.presentation.schedule.ScheduleEvent
 
@@ -97,7 +100,7 @@ fun GroupScheduleScreen(
                         TopAppBar(
                             title = {
                                 Text(
-                                    text = "Группа - ${state.selectedGroup}"
+                                    text = "${stringResource(id = R.string.screen_group_title)} - ${state.selectedGroup}"
                                 )
                             },
                             actions = {
@@ -134,16 +137,7 @@ fun GroupScheduleScreen(
                             it.lessons.isNullOrEmpty()
                         } != false) {
                         item {
-                            Column(
-                                modifier = Modifier.fillMaxSize(),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ) {
-                                Text(
-                                    text = "Пар нет",
-                                    style = MaterialTheme.typography.titleLarge
-                                )
-                            }
+                            NoLessonsCard()
                         }
                     }
                 }

@@ -34,6 +34,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
 import com.l0mtick.mgkcttimetable.presentation.components.NoConnectionCard
+import com.l0mtick.mgkcttimetable.presentation.components.NoLessonsCard
 import com.l0mtick.mgkcttimetable.presentation.components.ScheduleDayCard
 import com.l0mtick.mgkcttimetable.presentation.schedule.ScheduleEvent
 
@@ -133,16 +134,7 @@ fun TeacherScheduleScreen(
                             it.lessons.isNullOrEmpty()
                         } != false) {
                         item {
-                            Column(
-                                modifier = Modifier.fillMaxSize(),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ) {
-                                Text(
-                                    text = "Пар нет",
-                                    style = MaterialTheme.typography.titleLarge
-                                )
-                            }
+                            NoLessonsCard()
                         }
                     }
                 }

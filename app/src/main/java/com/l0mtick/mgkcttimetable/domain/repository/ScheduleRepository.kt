@@ -27,7 +27,16 @@ interface ScheduleRepository {
     fun getConnectionStatus(context: Context, callback: (Boolean) -> Unit)
 
     fun unsubscribeConnectionStatus()
+
     fun saveStartDestinationRoute(route: String)
 
     fun getSavedStartDestinationRoute(): String?
+
+    suspend fun enableNotifications(): Boolean
+
+    suspend fun disableNotifications()
+
+    fun getNotificationPermissionStatus(): Boolean
+
+    fun getEmptySelectedString(): String
 }

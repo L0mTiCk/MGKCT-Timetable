@@ -1,25 +1,38 @@
 package com.l0mtick.mgkcttimetable.data.repository
 
+import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import android.os.Build
 import android.util.Log
+import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.l0mtick.mgkcttimetable.data.remote.ScheduleApi
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.ktx.messaging
+import com.l0mtick.mgkcttimetable.R
+import com.l0mtick.mgkcttimetable.domain.repository.ScheduleApi
 import com.l0mtick.mgkcttimetable.data.remote.mappers.toWeekSchedule
 import com.l0mtick.mgkcttimetable.data.utils.Constants
 import com.l0mtick.mgkcttimetable.domain.model.schedule.WeekSchedule
 import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
 private const val API_LOG = "api_test"
 
 class ScheduleRepositoryImpl(
+    private val activity: Activity,
     private val sharedPreferences: SharedPreferences,
 //    private val scheduleDao: ScheduleDao,
     private val scheduleApi: ScheduleApi
@@ -27,6 +40,7 @@ class ScheduleRepositoryImpl(
 
     private lateinit var connectivityManager: ConnectivityManager
     private lateinit var networkCallback: ConnectivityManager.NetworkCallback
+    private var toast: Toast? = null
 
     override suspend fun parseGroupTimetable(groupNumber: String): WeekSchedule {
         delay(100)
@@ -59,45 +73,11 @@ class ScheduleRepositoryImpl(
     }
 
     override suspend fun getDbGroupTimetable(mode: Int): List<Map<Int, List<String>>>? {
-//        val groupName = getSavedGroup()
-//        val teacherName = getSavedTeacher()
-//        when (mode) {
-//            0 -> {
-//                return if (groupName != null)
-//                    scheduleDao.getScheduleForGroup(groupName)?.schedule
-//                else
-//                    null
-//            }
-//
-//            1 -> {
-//                return if (teacherName != null)
-//                    scheduleDao.getScheduleForGroup(teacherName)?.schedule
-//                else
-//                    null
-//            }
-//
-//            else -> return null
-//        }
-        return null
+        TODO("Not yet implemented")
     }
 
     override suspend fun saveTimetableToDb(schedule: MutableMap<String, List<Map<Int, List<String>>>>) {
-//        for (key in schedule.keys) {
-//            CoroutineScope(Dispatchers.IO).launch {
-//                val existingScheduleEntity = scheduleDao.getScheduleForGroup(key)
-//                if (existingScheduleEntity != null) {
-//                    // Update the existing entity
-//                    existingScheduleEntity.schedule = schedule[key]!!
-//                    scheduleDao.updateSchedule(existingScheduleEntity)
-//                } else {
-//                    // Insert a new entity
-//                    val newScheduleEntity =
-//                        ScheduleEntity(groupName = key, schedule = schedule[key]!!)
-//                    scheduleDao.insertSchedule(newScheduleEntity)
-//                }
-//            }
-//        }
-        Log.d("timetable_parser", "Saved to DB")
+        TODO("Not yet implemented")
     }
 
     override fun saveGroup(group: String) {
@@ -187,5 +167,62 @@ class ScheduleRepositoryImpl(
 
     override fun getSavedStartDestinationRoute(): String? {
         return sharedPreferences.getString(Constants.SAVE_ROUTE, "group")
+    }
+
+    override suspend fun enableNotifications(): Boolean {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val hasPermission = ContextCompat.checkSelfPermission(
+                activity,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+            if (!hasPermission) {
+                ActivityCompat.requestPermissions(
+                    activity,
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                    1
+                )
+            }
+            if (ContextCompat.checkSelfPermission(
+                    activity,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                toast = Toast.makeText(
+                    activity,
+                    activity.getString(R.string.toast_notifications),
+                    Toast.LENGTH_SHORT
+                )
+                toast?.show()
+                return false
+            }
+        }
+        CoroutineScope(Dispatchers.IO).launch {
+            Firebase.messaging.subscribeToTopic(Constants.SCHEDULE_UPDATE).await()
+            sharedPreferences.edit().putBoolean(Constants.ARE_NOTIFICATIONS_ENABLED, true).apply()
+        }
+        return true
+    }
+
+    override suspend fun disableNotifications() {
+        sharedPreferences.edit().putBoolean(Constants.ARE_NOTIFICATIONS_ENABLED, false).apply()
+        Firebase.messaging.unsubscribeFromTopic(Constants.SCHEDULE_UPDATE).await()
+    }
+
+    override fun getNotificationPermissionStatus(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            sharedPreferences.getBoolean(Constants.ARE_NOTIFICATIONS_ENABLED, true)
+        ) {
+            val hasPermission = ContextCompat.checkSelfPermission(
+                activity,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+            hasPermission
+        } else {
+            sharedPreferences.getBoolean(Constants.ARE_NOTIFICATIONS_ENABLED, true)
+        }
+    }
+
+    override fun getEmptySelectedString(): String {
+        return activity.getString(R.string.screen_no_group)
     }
 }
