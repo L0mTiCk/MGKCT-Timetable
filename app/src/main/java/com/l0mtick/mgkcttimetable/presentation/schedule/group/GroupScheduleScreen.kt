@@ -38,6 +38,7 @@ import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
 import com.l0mtick.mgkcttimetable.presentation.components.NoConnectionCard
 import com.l0mtick.mgkcttimetable.presentation.components.NoLessonsCard
 import com.l0mtick.mgkcttimetable.presentation.components.ScheduleDayCard
+import com.l0mtick.mgkcttimetable.presentation.components.UpdateStatusBar
 import com.l0mtick.mgkcttimetable.presentation.schedule.ScheduleEvent
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -139,6 +140,9 @@ fun GroupScheduleScreen(
                         item {
                             NoLessonsCard()
                         }
+                    }
+                    item {
+                        UpdateStatusBar(state = state)
                     }
                 }
             }

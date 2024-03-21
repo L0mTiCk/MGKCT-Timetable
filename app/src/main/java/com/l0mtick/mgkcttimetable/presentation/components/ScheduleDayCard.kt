@@ -31,6 +31,8 @@ import com.l0mtick.mgkcttimetable.domain.model.schedule.Lesson
 import com.l0mtick.mgkcttimetable.domain.model.schedule.ScheduleUnion
 import com.l0mtick.mgkcttimetable.presentation.schedule.ScheduleEvent
 import com.l0mtick.mgkcttimetable.presentation.schedule.ScheduleState
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -95,7 +97,10 @@ fun ScheduleDayCard(
                                 modifier = Modifier
                                     .background(
                                         //TODO: return color highlighting for current lesson
-                                        color = Color.Transparent,
+                                        color = if (daySchedule.date == LocalDateTime.now().format(
+                                                DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+                                            && getLessonNumber(scheduleUnion) == state.currentLesson)
+                                            MaterialTheme.colorScheme.tertiaryContainer else Color.Transparent,
                                         shape = RoundedCornerShape(20.dp)
                                     )
                                     .padding(horizontal = 20.dp, vertical = 10.dp)
@@ -169,5 +174,13 @@ fun LessonRow(lesson: Lesson) {
         Text(
             text = lesson.cabinet ?: "-",
         )
+    }
+}
+
+private fun getLessonNumber(scheduleUnion: ScheduleUnion): Int {
+    return when (scheduleUnion) {
+        is ScheduleUnion.LessonArrayValue -> scheduleUnion.value[0].number ?: 0;
+        is ScheduleUnion.LessonValue -> scheduleUnion.value.number ?: 0;
+        else -> 0;
     }
 }

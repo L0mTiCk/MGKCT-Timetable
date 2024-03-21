@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.icu.util.Calendar
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
@@ -16,6 +17,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.ktx.messaging
+import com.google.type.DateTime
 import com.l0mtick.mgkcttimetable.R
 import com.l0mtick.mgkcttimetable.domain.repository.ScheduleApi
 import com.l0mtick.mgkcttimetable.data.remote.mappers.toWeekSchedule
@@ -28,6 +30,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.time.DayOfWeek
+import java.time.LocalDateTime
+import java.util.Locale
+import java.util.TimeZone
 
 private const val API_LOG = "api_test"
 
@@ -224,5 +231,25 @@ class ScheduleRepositoryImpl(
 
     override fun getEmptySelectedString(): String {
         return activity.getString(R.string.screen_no_group)
+    }
+
+    override fun getCurrentLesson(): Int {
+        val calendar = Calendar.getInstance()
+        val currentTime = SimpleDateFormat("HH:mm", Locale.getDefault()).format(calendar.time)
+
+        val schedule: List<String> = if (LocalDateTime.now().dayOfWeek == DayOfWeek.SATURDAY)
+            listOf("09:00", "10:50", "12:50", "14:40", "16:30", "18:20")
+        else
+            listOf("09:00", "10:50", "13:00", "14:50", "16:40", "18:30")
+
+        var currentLesson = -1
+        for (i in schedule.indices) {
+            if (currentTime < schedule[i]) {
+                currentLesson = i
+                break
+            }
+        }
+        Log.d(API_LOG, "Current lesson $currentLesson")
+        return currentLesson
     }
 }
