@@ -39,4 +39,6 @@ interface ScheduleRepository {
     fun getNotificationPermissionStatus(): Boolean
 
     fun getEmptySelectedString(): String
+
+    fun getCurrentLesson(): Int
 }

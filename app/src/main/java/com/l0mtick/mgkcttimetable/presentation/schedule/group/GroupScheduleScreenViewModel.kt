@@ -59,6 +59,11 @@ class GroupScheduleScreenViewModel(private val scheduleRepository: ScheduleRepos
                     } catch (e: Exception) {
                         Log.e("timetableTest", "${e.message}")
                     }
+                    _state.update {
+                        it.copy(
+                            currentLesson = scheduleRepository.getCurrentLesson()
+                        )
+                    }
                     onEvent(ScheduleEvent.OnUpdatingFinished)
                 }
             }

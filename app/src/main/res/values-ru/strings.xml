@@ -18,4 +18,6 @@
     <string name="settings_language_main">Изменение языка приложения</string>
     <string name="settings_other">Прочее</string>
     <string name="toast_notifications">Предоставьте разрешение в настройках</string>
+    <string name="screen_updated">Обновлено</string>
+    <string name="screen_changed">Изменено</string>
 </resources>

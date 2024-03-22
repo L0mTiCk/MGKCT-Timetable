@@ -13,12 +13,14 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
-class TeacherScheduleScreenViewModel(private val scheduleRepository: ScheduleRepository): ViewModel() {
+class TeacherScheduleScreenViewModel(private val scheduleRepository: ScheduleRepository) :
+    ViewModel() {
 
     private val _state = MutableStateFlow(
         ScheduleState(
-        selectedGroup = scheduleRepository.getSavedGroup() ?: scheduleRepository.getEmptySelectedString()
-    )
+            selectedGroup = scheduleRepository.getSavedGroup()
+                ?: scheduleRepository.getEmptySelectedString()
+        )
     )
     val state = _state.asStateFlow()
     fun onEvent(event: ScheduleEvent) {
@@ -43,16 +45,26 @@ class TeacherScheduleScreenViewModel(private val scheduleRepository: ScheduleRep
                     try {
                         _state.update {
                             it.copy(
-                                selectedGroup = scheduleRepository.getSavedTeacher() ?: "Никто не выбран"
+                                selectedGroup = scheduleRepository.getSavedTeacher()
+                                    ?: "Никто не выбран"
                             )
                         }
                     } catch (e: Exception) {
                         Log.e("timetableTest", "Error while updating saved teacher: $e")
                     }
                     delay(100)
+                    try {
+                        _state.update {
+                            it.copy(
+                                groupSchedule = scheduleRepository.parseTeacherTimetable(_state.value.selectedGroup),
+                            )
+                        }
+                    } catch (e: Exception) {
+                        Log.e("timetableTest", "${e.message}")
+                    }
                     _state.update {
                         it.copy(
-                            groupSchedule = scheduleRepository.parseTeacherTimetable(_state.value.selectedGroup),
+                            currentLesson = scheduleRepository.getCurrentLesson()
                         )
                     }
                     onEvent(ScheduleEvent.OnUpdatingFinished)
@@ -66,6 +78,7 @@ class TeacherScheduleScreenViewModel(private val scheduleRepository: ScheduleRep
                     }
                 }
             }
+
             ScheduleEvent.OnUpdatingStart -> {
                 viewModelScope.launch {
                     _state.update {
@@ -88,17 +101,5 @@ class TeacherScheduleScreenViewModel(private val scheduleRepository: ScheduleRep
 
     init {
         onEvent(ScheduleEvent.UpdateSchedule)
-        viewModelScope.launch {
-            var currentHour = LocalDateTime.now().hour
-            var delay = 1000 * 60 * 60 - (LocalDateTime.now().minute) * 60 * 1000L
-            while (true) {
-                delay(delay)
-                currentHour += 1
-                delay = 1000 * 60 * 60
-                _state.update {
-                    it.copy(currentHour = currentHour)
-                }
-            }
-        }
     }
 }

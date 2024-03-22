@@ -10,12 +10,14 @@ import com.l0mtick.mgkcttimetable.domain.model.schedule.WeekSchedule
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
 
 fun GroupScheduleDto.toWeekSchedule(): WeekSchedule {
     val scheduleList = mutableListOf<DaySchedule>()
     val changedDate = Date(response?.changed ?: 0L)
     val updateDate = Date(response?.update ?: 0L)
     val sdf = SimpleDateFormat("dd MMMM HH:mm:ss", Locale.getDefault())
+    sdf.timeZone = TimeZone.getDefault()
     val changedFormatted = sdf.format(changedDate)
     val updateFormatted = sdf.format(updateDate)
     response?.days?.forEach {

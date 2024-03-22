@@ -17,4 +17,6 @@
     <string name="settings_language_main">Changе application language</string>
     <string name="settings_other">Other</string>
     <string name="toast_notifications">Grant permission in the settings</string>
+    <string name="screen_updated">Updated</string>
+    <string name="screen_changed">Changed</string>
 </resources>

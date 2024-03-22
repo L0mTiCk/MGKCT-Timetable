@@ -10,6 +10,6 @@ data class ScheduleState (
     val isScheduleUpdating: Boolean = true,
     val selectedDay: String = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
     val selectedGroup: String = "",
-    val currentHour: Int = LocalDateTime.now().hour,
+    val currentLesson: Int = 0,
     val groupSchedule: WeekSchedule = WeekSchedule(null, "", "")
 )
