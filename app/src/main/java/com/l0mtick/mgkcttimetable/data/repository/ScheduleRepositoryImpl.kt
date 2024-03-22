@@ -17,7 +17,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.ktx.messaging
-import com.google.type.DateTime
 import com.l0mtick.mgkcttimetable.R
 import com.l0mtick.mgkcttimetable.domain.repository.ScheduleApi
 import com.l0mtick.mgkcttimetable.data.remote.mappers.toWeekSchedule
@@ -30,11 +29,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import java.text.SimpleDateFormat
 import java.time.DayOfWeek
 import java.time.LocalDateTime
 import java.util.Locale
-import java.util.TimeZone
 
 private const val API_LOG = "api_test"
 
@@ -55,10 +55,11 @@ class ScheduleRepositoryImpl(
             try {
                 Log.d(API_LOG, "Parse group schedule, group - $groupNumber")
                 val result = scheduleApi.getGroupSchedule(groupNumber).toWeekSchedule()
-                Log.d(API_LOG, result.toString())
+//                Log.d(API_LOG, result.toString())
                 result
             } catch (e: Exception) {
                 Log.e(API_LOG, e.toString())
+                showApiError(e)
                 WeekSchedule(null, "", "")
             }
         }
@@ -70,10 +71,11 @@ class ScheduleRepositoryImpl(
             try {
                 Log.d(API_LOG, "Parse teacher schedule, teacher - $teacher")
                 val result = scheduleApi.getTeacherSchedule(teacher).toWeekSchedule()
-                Log.d(API_LOG, result.toString())
+//                Log.d(API_LOG, result.toString())
                 result
             } catch (e: Exception) {
                 Log.e(API_LOG, e.toString())
+                showApiError(e)
                 WeekSchedule(null, "", "")
             }
         }
@@ -251,5 +253,29 @@ class ScheduleRepositoryImpl(
         }
         Log.d(API_LOG, "Current lesson $currentLesson")
         return currentLesson
+    }
+
+    private fun showApiError(e: Exception) {
+        activity.runOnUiThread {
+            when (e) {
+                is UnknownHostException, is SocketTimeoutException -> {
+                    toast = Toast.makeText(
+                        activity,
+                        "Error with connecting to server",
+                        Toast.LENGTH_SHORT
+                    )
+                    toast?.show()
+                }
+
+                else -> {
+                    toast = Toast.makeText(
+                        activity,
+                        "Internal error",
+                        Toast.LENGTH_SHORT
+                    )
+                    toast?.show()
+                }
+            }
+        }
     }
 }
