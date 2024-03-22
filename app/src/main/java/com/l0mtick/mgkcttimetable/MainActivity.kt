@@ -73,11 +73,13 @@ class MainActivity : ComponentActivity() {
         val isNotificationRequestRequired = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
         val navItems = listOf(
             NavigationItem(
+                id = "group",
                 title = getString(R.string.navigation_group),
                 selectedIcon = Icons.Filled.List,
                 unselectedIcon = Icons.Outlined.List,
             ),
             NavigationItem(
+                id = "teacher",
                 title = getString(R.string.navigation_teacher),
                 selectedIcon = Icons.Filled.Person,
                 unselectedIcon = Icons.Outlined.Person,
@@ -109,10 +111,10 @@ class MainActivity : ComponentActivity() {
                                 navItems.forEach { screen ->
                                     NavigationBarItem(
                                         label = { Text(screen.title) },
-                                        selected = currentDestination?.hierarchy?.any { it.route == screen.title.lowercase() } == true,
+                                        selected = currentDestination?.hierarchy?.any { it.route == screen.id.lowercase() } == true,
                                         icon = {
                                             Icon(
-                                                if (currentDestination?.hierarchy?.any { it.route == screen.title.lowercase() } == true) {
+                                                if (currentDestination?.hierarchy?.any { it.route == screen.id.lowercase() } == true) {
                                                     screen.selectedIcon
                                                 } else {
                                                     screen.unselectedIcon
@@ -121,9 +123,9 @@ class MainActivity : ComponentActivity() {
                                             )
                                         },
                                         onClick = {
-                                            scheduleRepository.saveStartDestinationRoute(screen.title.lowercase())
+                                            scheduleRepository.saveStartDestinationRoute(screen.id.lowercase())
                                             if (currentDestination?.route.toString() != "settings") {
-                                                navController.navigate(screen.title.lowercase()) {
+                                                navController.navigate(screen.id.lowercase()) {
                                                     // Pop up to the start destination of the graph to
                                                     // avoid building up a large stack of destinations
                                                     // on the back stack as users select items
