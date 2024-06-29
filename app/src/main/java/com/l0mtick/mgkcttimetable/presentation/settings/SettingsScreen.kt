@@ -25,31 +25,28 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.l0mtick.mgkcttimetable.R
-import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
 import com.l0mtick.mgkcttimetable.presentation.settings.components.AppInfoDialogBox
 import com.l0mtick.mgkcttimetable.presentation.settings.components.other.AppInfoRowItem
 import com.l0mtick.mgkcttimetable.presentation.settings.components.other.NotificationRowItem
 import com.l0mtick.mgkcttimetable.presentation.settings.components.OutlinedSelector
+import org.koin.androidx.compose.getViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    repository: ScheduleRepository,
-    navController: NavController
+    navController: NavController,
+    settingsScreenViewModel: SettingsScreenViewModel
 ) {
-    val viewModelFactory = SettingsScreenViewModelFactory(scheduleRepository = repository)
-    val viewModel: SettingsScreenViewModel = viewModel(factory = viewModelFactory)
-    val state = viewModel.state.collectAsState().value
-    val onEvent = viewModel::onEvent
+    val state = settingsScreenViewModel.state.collectAsState().value
+    val onEvent = settingsScreenViewModel::onEvent
     val onGroupEvent: (String) -> Unit = { groupName ->
-        viewModel.onEvent(SettingsEvent.OnSpecificGroupClick(groupName))
+        settingsScreenViewModel.onEvent(SettingsEvent.OnSpecificGroupClick(groupName))
     }
 
     val onTeacherEvent: (String) -> Unit = { teacherName ->
-        viewModel.onEvent(SettingsEvent.OnSpecificTeacherClick(teacherName))
+        settingsScreenViewModel.onEvent(SettingsEvent.OnSpecificTeacherClick(teacherName))
     }
 
     AnimatedVisibility(

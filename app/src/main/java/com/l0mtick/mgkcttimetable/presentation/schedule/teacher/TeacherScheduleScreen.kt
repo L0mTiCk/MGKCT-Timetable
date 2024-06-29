@@ -42,28 +42,12 @@ import com.l0mtick.mgkcttimetable.presentation.schedule.ScheduleEvent
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun TeacherScheduleScreen(
-    scheduleRepository: ScheduleRepository,
-    navController: NavController
+    navController: NavController,
+    teacherScheduleScreenViewModel: TeacherScheduleScreenViewModel
 ) {
-    val scheduleScreenViewModelFactory =
-        TeacherScheduleScreenViewModelFactory(scheduleRepository = scheduleRepository)
-    val teacherScheduleScreenViewModel: TeacherScheduleScreenViewModel =
-        viewModel(factory = scheduleScreenViewModelFactory)
     val state = teacherScheduleScreenViewModel.state.collectAsState().value
     val onEvent = teacherScheduleScreenViewModel::onEvent
-    val context = LocalContext.current
     val weekSchedule = state.groupSchedule
-    DisposableEffect(Unit) {
-        scheduleRepository.getConnectionStatus(
-            context = context,
-            callback = {
-                onEvent(ScheduleEvent.OnNetworkChange(it))
-            }
-        )
-        onDispose {
-            scheduleRepository.unsubscribeConnectionStatus()
-        }
-    }
     Scaffold {
         Box(
             modifier = Modifier.fillMaxSize()

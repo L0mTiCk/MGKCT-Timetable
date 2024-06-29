@@ -40,32 +40,18 @@ import com.l0mtick.mgkcttimetable.presentation.components.NoLessonsCard
 import com.l0mtick.mgkcttimetable.presentation.components.ScheduleDayCard
 import com.l0mtick.mgkcttimetable.presentation.components.UpdateStatusBar
 import com.l0mtick.mgkcttimetable.presentation.schedule.ScheduleEvent
+import org.koin.androidx.compose.getViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun GroupScheduleScreen(
-    scheduleRepository: ScheduleRepository,
-    navController: NavController
+    navController: NavController,
+    groupScheduleScreenViewModel: GroupScheduleScreenViewModel
 ) {
-    val groupScheduleScreenViewModelFactory =
-        GroupScheduleScreenViewModelFactory(scheduleRepository = scheduleRepository)
-    val groupScheduleScreenViewModel: GroupScheduleScreenViewModel =
-        viewModel(factory = groupScheduleScreenViewModelFactory)
     val state = groupScheduleScreenViewModel.state.collectAsState().value
     val onEvent = groupScheduleScreenViewModel::onEvent
-    val context = LocalContext.current
+
     val weekSchedule = state.groupSchedule
-    DisposableEffect(Unit) {
-        scheduleRepository.getConnectionStatus(
-            context = context,
-            callback = {
-                onEvent(ScheduleEvent.OnNetworkChange(it))
-            }
-        )
-        onDispose {
-            scheduleRepository.unsubscribeConnectionStatus()
-        }
-    }
     Scaffold {
         Box(
             //contentAlignment = Alignment.Center,

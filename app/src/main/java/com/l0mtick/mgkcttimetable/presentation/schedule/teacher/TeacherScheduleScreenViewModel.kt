@@ -101,5 +101,8 @@ class TeacherScheduleScreenViewModel(private val scheduleRepository: ScheduleRep
 
     init {
         onEvent(ScheduleEvent.UpdateSchedule)
+        scheduleRepository.getConnectionStatus {
+            onEvent(ScheduleEvent.OnNetworkChange(it))
+        }
     }
 }

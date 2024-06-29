@@ -42,12 +42,19 @@ import com.l0mtick.mgkcttimetable.data.remote.ScheduleApiImpl
 import com.l0mtick.mgkcttimetable.data.repository.ScheduleRepositoryImpl
 import com.l0mtick.mgkcttimetable.data.utils.Constants
 import com.l0mtick.mgkcttimetable.domain.model.NavigationItem
+import com.l0mtick.mgkcttimetable.domain.repository.ScheduleApi
 import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
 import com.l0mtick.mgkcttimetable.presentation.components.NotificationDialog
 import com.l0mtick.mgkcttimetable.presentation.schedule.group.GroupScheduleScreen
+import com.l0mtick.mgkcttimetable.presentation.schedule.group.GroupScheduleScreenViewModel
 import com.l0mtick.mgkcttimetable.presentation.schedule.teacher.TeacherScheduleScreen
+import com.l0mtick.mgkcttimetable.presentation.schedule.teacher.TeacherScheduleScreenViewModel
 import com.l0mtick.mgkcttimetable.presentation.settings.SettingsScreen
+import com.l0mtick.mgkcttimetable.presentation.settings.SettingsScreenViewModel
 import com.l0mtick.mgkcttimetable.ui.theme.MGKCTTimetableTheme
+import org.koin.android.ext.android.get
+import org.koin.android.ext.android.inject
+import org.koin.androidx.compose.getViewModel
 import java.io.InputStream
 import java.util.Properties
 
@@ -58,18 +65,12 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var firebaseAnalytics: FirebaseAnalytics
 
-    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         actionBar?.hide()
         firebaseAnalytics = Firebase.analytics
-        val api = ScheduleApiImpl(token = getApiKey())
-//        database = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "my-database")
-//            .fallbackToDestructiveMigration()
-//            .build()
         val sharedPreferences = getSharedPreferences(Constants.SHARED_PREF_NAME, Context.MODE_PRIVATE)
-        val scheduleRepository: ScheduleRepository =
-            ScheduleRepositoryImpl(activity = this, sharedPreferences = sharedPreferences, scheduleApi = api)
+        val scheduleRepository = get<ScheduleRepository>()
         val isNotificationRequestRequired = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
         val navItems = listOf(
             NavigationItem(
@@ -152,22 +153,22 @@ class MainActivity : ComponentActivity() {
                         ) {
                             composable("group") {
                                 GroupScheduleScreen(
-                                    scheduleRepository = scheduleRepository,
-                                    navController = navController
+                                    navController = navController,
+                                    groupScheduleScreenViewModel = getViewModel<GroupScheduleScreenViewModel>()
                                 )
                             }
 
                             composable("settings") {
                                 SettingsScreen(
-                                    repository = scheduleRepository,
-                                    navController = navController
+                                    navController = navController,
+                                    settingsScreenViewModel = getViewModel<SettingsScreenViewModel>()
                                 )
                             }
 
                             composable("teacher") {
                                 TeacherScheduleScreen(
-                                    scheduleRepository = scheduleRepository,
-                                    navController = navController
+                                    navController = navController,
+                                    teacherScheduleScreenViewModel = getViewModel<TeacherScheduleScreenViewModel>()
                                 )
                             }
                         }
@@ -191,12 +192,5 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
-    }
-
-    fun getApiKey(): String {
-        val properties = Properties()
-        val inputStream: InputStream = applicationContext.assets.open("config.properties")
-        properties.load(inputStream)
-        return properties.getProperty("api_key")
     }
 }

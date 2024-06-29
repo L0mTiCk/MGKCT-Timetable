@@ -98,5 +98,8 @@ class GroupScheduleScreenViewModel(private val scheduleRepository: ScheduleRepos
 
     init {
         onEvent(ScheduleEvent.UpdateSchedule)
+        scheduleRepository.getConnectionStatus {
+            onEvent(ScheduleEvent.OnNetworkChange(it))
+        }
     }
 }
