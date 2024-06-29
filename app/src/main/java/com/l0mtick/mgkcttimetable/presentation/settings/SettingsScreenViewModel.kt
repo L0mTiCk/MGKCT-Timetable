@@ -1,6 +1,8 @@
 package com.l0mtick.mgkcttimetable.presentation.settings
 
+import android.app.Activity
 import android.util.Log
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
@@ -102,7 +104,9 @@ class SettingsScreenViewModel(private val scheduleRepository: ScheduleRepository
                     viewModelScope.launch {
                         _state.update {
                             it.copy(
-                                isNotificationsEnabled = scheduleRepository.enableNotifications()
+                                isNotificationsEnabled = scheduleRepository.enableNotifications(
+
+                                )
                             )
                         }
                     }

@@ -24,7 +24,7 @@ interface ScheduleRepository {
 
     suspend fun getAllTeacherNames(): List<String>?
 
-    fun getConnectionStatus(context: Context, callback: (Boolean) -> Unit)
+    fun getConnectionStatus(callback: (Boolean) -> Unit)
 
     fun unsubscribeConnectionStatus()
 

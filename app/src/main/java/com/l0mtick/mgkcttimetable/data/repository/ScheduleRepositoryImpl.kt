@@ -2,8 +2,8 @@ package com.l0mtick.mgkcttimetable.data.repository
 
 import android.Manifest
 import android.app.Activity
+import android.app.Application
 import android.content.Context
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.icu.util.Calendar
 import android.net.ConnectivityManager
@@ -13,6 +13,7 @@ import android.net.NetworkRequest
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.firebase.ktx.Firebase
@@ -21,6 +22,7 @@ import com.l0mtick.mgkcttimetable.R
 import com.l0mtick.mgkcttimetable.domain.repository.ScheduleApi
 import com.l0mtick.mgkcttimetable.data.remote.mappers.toWeekSchedule
 import com.l0mtick.mgkcttimetable.data.utils.Constants
+import com.l0mtick.mgkcttimetable.data.utils.getActivity
 import com.l0mtick.mgkcttimetable.domain.model.schedule.WeekSchedule
 import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
 import kotlinx.coroutines.CoroutineScope
@@ -39,12 +41,12 @@ import java.util.Locale
 private const val API_LOG = "api_test"
 
 class ScheduleRepositoryImpl(
-    private val activity: Activity,
-    private val sharedPreferences: SharedPreferences,
+    private val application: Application,
 //    private val scheduleDao: ScheduleDao,
     private val scheduleApi: ScheduleApi
 ) : ScheduleRepository {
 
+    private var sharedPreferences = application.getSharedPreferences(Constants.SHARED_PREF_NAME, Context.MODE_PRIVATE)
     private lateinit var connectivityManager: ConnectivityManager
     private lateinit var networkCallback: ConnectivityManager.NetworkCallback
     private var toast: Toast? = null
@@ -127,13 +129,13 @@ class ScheduleRepositoryImpl(
         }
     }
 
-    override fun getConnectionStatus(context: Context, callback: (Boolean) -> Unit) {
+    override fun getConnectionStatus(callback: (Boolean) -> Unit) {
         try {
             val networkRequest = NetworkRequest.Builder()
                 .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
                 .build()
             connectivityManager = ContextCompat.getSystemService(
-                context,
+                application,
                 ConnectivityManager::class.java
             ) as ConnectivityManager
             networkCallback = object : ConnectivityManager.NetworkCallback() {
@@ -179,26 +181,29 @@ class ScheduleRepositoryImpl(
     }
 
     override suspend fun enableNotifications(): Boolean {
+        val activity = application.applicationContext.getActivity()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val hasPermission = ContextCompat.checkSelfPermission(
-                activity,
+                application,
                 Manifest.permission.POST_NOTIFICATIONS
             ) == PackageManager.PERMISSION_GRANTED
             if (!hasPermission) {
-                ActivityCompat.requestPermissions(
-                    activity,
-                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                    1
-                )
+                if (activity != null) {
+                    ActivityCompat.requestPermissions(
+                        activity,
+                        arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                        1
+                    )
+                }
             }
             if (ContextCompat.checkSelfPermission(
-                    activity,
+                    application,
                     Manifest.permission.POST_NOTIFICATIONS
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
                 toast = Toast.makeText(
-                    activity,
-                    activity.getString(R.string.toast_notifications),
+                    application,
+                    application.getString(R.string.toast_notifications),
                     Toast.LENGTH_SHORT
                 )
                 toast?.show()
@@ -222,7 +227,7 @@ class ScheduleRepositoryImpl(
             sharedPreferences.getBoolean(Constants.ARE_NOTIFICATIONS_ENABLED, true)
         ) {
             val hasPermission = ContextCompat.checkSelfPermission(
-                activity,
+                application,
                 Manifest.permission.POST_NOTIFICATIONS
             ) == PackageManager.PERMISSION_GRANTED
             hasPermission
@@ -232,7 +237,7 @@ class ScheduleRepositoryImpl(
     }
 
     override fun getEmptySelectedString(): String {
-        return activity.getString(R.string.screen_no_group)
+        return application.getString(R.string.screen_no_group)
     }
 
     override fun getCurrentLesson(): Int {
@@ -256,11 +261,12 @@ class ScheduleRepositoryImpl(
     }
 
     private fun showApiError(e: Exception) {
-        activity.runOnUiThread {
+        val activity = application.applicationContext.getActivity()
+        activity?.runOnUiThread {
             when (e) {
                 is UnknownHostException, is SocketTimeoutException -> {
                     toast = Toast.makeText(
-                        activity,
+                        application,
                         "Error with connecting to server",
                         Toast.LENGTH_SHORT
                     )
@@ -269,7 +275,7 @@ class ScheduleRepositoryImpl(
 
                 else -> {
                     toast = Toast.makeText(
-                        activity,
+                        application,
                         "Internal error",
                         Toast.LENGTH_SHORT
                     )
