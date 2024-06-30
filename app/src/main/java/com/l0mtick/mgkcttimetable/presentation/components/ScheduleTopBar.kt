@@ -19,7 +19,6 @@ import com.l0mtick.mgkcttimetable.presentation.schedule.ScheduleState
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScheduleTopBar(
-    modifier: Modifier = Modifier,
     state: ScheduleState,
     onEvent: (ScheduleEvent) -> Unit,
     navController: NavController
