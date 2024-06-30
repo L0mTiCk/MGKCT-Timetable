@@ -69,7 +69,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         actionBar?.hide()
         firebaseAnalytics = Firebase.analytics
-        val sharedPreferences = getSharedPreferences(Constants.SHARED_PREF_NAME, Context.MODE_PRIVATE)
+        val sharedPreferences =
+            getSharedPreferences(Constants.SHARED_PREF_NAME, Context.MODE_PRIVATE)
         val scheduleRepository = get<ScheduleRepository>()
         val isNotificationRequestRequired = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
         val navItems = listOf(
@@ -93,7 +94,12 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     var isFirstLaunch by remember {
-                        mutableStateOf(sharedPreferences.getBoolean(Constants.IS_FIRST_LAUNCH, true))
+                        mutableStateOf(
+                            sharedPreferences.getBoolean(
+                                Constants.IS_FIRST_LAUNCH,
+                                true
+                            )
+                        )
                     }
                     if (isFirstLaunch && isNotificationRequestRequired) {
                         NotificationDialog(onDismiss = {
@@ -125,20 +131,12 @@ class MainActivity : ComponentActivity() {
                                         },
                                         onClick = {
                                             scheduleRepository.saveStartDestinationRoute(screen.id.lowercase())
-                                            if (currentDestination?.route.toString() != "settings") {
-                                                navController.navigate(screen.id.lowercase()) {
-                                                    // Pop up to the start destination of the graph to
-                                                    // avoid building up a large stack of destinations
-                                                    // on the back stack as users select items
-                                                    popUpTo(navController.graph.findStartDestination().id) {
-                                                        saveState = true
-                                                    }
-                                                    // Avoid multiple copies of the same destination when
-                                                    // reselecting the same item
-                                                    launchSingleTop = true
-                                                    // Restore state when reselecting a previously selected item
-                                                    restoreState = true
+                                            navController.navigate(screen.id.lowercase()) {
+                                                popUpTo(navController.graph.findStartDestination().id) {
+                                                    saveState = true
                                                 }
+                                                launchSingleTop = true
+                                                restoreState = true
                                             }
                                         }
                                     )
@@ -148,7 +146,8 @@ class MainActivity : ComponentActivity() {
                     ) {
                         NavHost(
                             navController = navController,
-                            startDestination = scheduleRepository.getSavedStartDestinationRoute() ?: "group",
+                            startDestination = scheduleRepository.getSavedStartDestinationRoute()
+                                ?: "group",
                             modifier = Modifier.padding(it)
                         ) {
                             composable("group") {
@@ -179,12 +178,12 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun requestNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val hasPermission = ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.POST_NOTIFICATIONS
             ) == PackageManager.PERMISSION_GRANTED
-            if (!hasPermission){
+            if (!hasPermission) {
                 ActivityCompat.requestPermissions(
                     this,
                     arrayOf(Manifest.permission.POST_NOTIFICATIONS),
