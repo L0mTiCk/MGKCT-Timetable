@@ -1,6 +1,7 @@
 package com.l0mtick.mgkcttimetable.presentation.settings.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -15,10 +16,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.l0mtick.mgkcttimetable.R
-import com.l0mtick.mgkcttimetable.presentation.settings.SettingsEvent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,7 +54,7 @@ fun OutlinedSelector(label: String, value: String, elements: List<Any>, onEvent:
         ExposedDropdownMenu(
             expanded = isExpanded,
             onDismissRequest = { isExpanded = false },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.height(350.dp)
         ) {
             if (elements.isNotEmpty()) {
                 elements.forEach {
