@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.l0mtick.mgkcttimetable.R
 import com.l0mtick.mgkcttimetable.presentation.schedule.ScheduleEvent
 import com.l0mtick.mgkcttimetable.presentation.schedule.ScheduleState
@@ -44,7 +45,11 @@ fun ScheduleTopBar(
                 )
             }
             IconButton(onClick = {
-                navController.navigate("settings")
+                navController.navigate("settings") {
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        saveState = true
+                    }
+                }
             }) {
                 Icon(
                     imageVector = Icons.TwoTone.Settings,

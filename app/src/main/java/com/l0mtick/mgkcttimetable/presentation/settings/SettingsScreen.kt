@@ -15,6 +15,7 @@ import androidx.compose.material.icons.twotone.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -67,7 +68,9 @@ fun SettingsScreen(
                             try {
                                 val previousRoute =
                                     navController.previousBackStackEntry?.destination?.route
-                                navController.navigate(route = previousRoute ?: throw IllegalArgumentException()) {
+                                navController.navigate(
+                                    route = previousRoute ?: throw IllegalArgumentException()
+                                ) {
                                     popUpTo(route = previousRoute) {
                                         inclusive = true
                                     }
@@ -91,11 +94,19 @@ fun SettingsScreen(
                 .padding(horizontal = 20.dp, vertical = it.calculateTopPadding())
                 .fillMaxSize()
         ) {
-            OutlinedSelector(label = stringResource(id = R.string.navigation_group), value = state.selectedGroup,
-                elements = state.allGroups, onEvent = onGroupEvent)
-            OutlinedSelector(label = stringResource(id = R.string.navigation_teacher), value = state.selectedTeacher,
-                elements = state.allTeachers, onEvent = onTeacherEvent)
-            Divider(
+            OutlinedSelector(
+                label = stringResource(id = R.string.navigation_group),
+                value = state.selectedGroup,
+                elements = state.allGroups,
+                onEvent = onGroupEvent
+            )
+            OutlinedSelector(
+                label = stringResource(id = R.string.navigation_teacher),
+                value = state.selectedTeacher,
+                elements = state.allTeachers,
+                onEvent = onTeacherEvent
+            )
+            HorizontalDivider(
                 modifier = Modifier.padding(top = 30.dp)
             )
             Column(
