@@ -1,6 +1,6 @@
 package com.l0mtick.mgkcttimetable.data.remote.mappers
 
-import com.l0mtick.mgkcttimetable.data.remote.dto.Day
+import com.l0mtick.mgkcttimetable.data.remote.dto.TeacherDay
 import com.l0mtick.mgkcttimetable.data.remote.dto.TeacherScheduleDto
 import com.l0mtick.mgkcttimetable.domain.model.schedule.DaySchedule
 import com.l0mtick.mgkcttimetable.domain.model.schedule.Lesson
@@ -18,7 +18,7 @@ fun TeacherScheduleDto.toWeekSchedule(): WeekSchedule {
     val changedFormatted = sdf.format(changedDate)
     val updateFormatted = sdf.format(updateDate)
     response?.days?.forEach {
-        scheduleList.add(it.toDaySchedyle())
+        scheduleList.add(it.toDaySchedule())
     }
     return WeekSchedule(
         days = scheduleList,
@@ -27,7 +27,7 @@ fun TeacherScheduleDto.toWeekSchedule(): WeekSchedule {
     )
 }
 
-fun Day.toDaySchedyle(): DaySchedule {
+fun TeacherDay.toDaySchedule(): DaySchedule {
     val lessonList = mutableListOf<ScheduleUnion?>()
     lessons?.forEachIndexed { index, lesson ->
         when(lesson) {
