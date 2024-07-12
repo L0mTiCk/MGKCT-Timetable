@@ -5,6 +5,7 @@ plugins {
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
     id("com.google.firebase.firebase-perf")
+    kotlin("plugin.serialization")
 }
 
 android {
@@ -56,8 +57,8 @@ android {
 dependencies {
     val nav_version = "2.7.7"
     val room_version = "2.6.1"
-    val work_version = "2.9.0"
     val koin_version = "3.5.0"
+    val ktor_version = "2.3.12"
 
     implementation("androidx.navigation:navigation-compose:$nav_version")
     implementation("androidx.core:core-ktx:1.13.1")
@@ -93,10 +94,17 @@ dependencies {
     kapt("androidx.room:room-compiler:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
 
+    //ktor
+    implementation("io.ktor:ktor-client-core:$ktor_version")
+    implementation("io.ktor:ktor-client-okhttp:$ktor_version")
+//    implementation("io.ktor:ktor-client-darwin:$ktor_version")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
+    implementation("io.ktor:ktor-client-auth:$ktor_version")
+
     //gson
-    implementation("com.squareup.okhttp3:okhttp:4.11.0")
-    implementation("com.google.code.gson:gson:2.10.1")
-    implementation("com.beust:klaxon:5.5")
+//    implementation("com.squareup.okhttp3:okhttp:4.11.0")
+//    implementation("com.beust:klaxon:5.5")
 
     //splashscreen
     implementation("androidx.core:core-splashscreen:1.0.1")
