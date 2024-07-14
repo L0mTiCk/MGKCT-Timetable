@@ -20,4 +20,5 @@
     <string name="toast_notifications">Предоставьте разрешение в настройках</string>
     <string name="screen_updated">Обновлено</string>
     <string name="screen_changed">Изменено</string>
+    <string name="widget_description">Виджет показывающий расписание на сегодня</string>
 </resources>
