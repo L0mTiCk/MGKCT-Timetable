@@ -6,7 +6,6 @@ import java.time.format.DateTimeFormatter
 
 data class ScheduleState (
     val isConnected: Boolean = true,
-    val currentDayOfWeek: String? = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
     val isScheduleUpdating: Boolean = true,
     val selectedDay: String = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
     val selectedGroup: String = "",

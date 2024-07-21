@@ -1,34 +1,42 @@
 package com.l0mtick.mgkcttimetable.presentation.widget
 
 import android.content.Context
-import android.content.Intent
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.MaterialTheme
+import android.util.Log
+import androidx.compose.material3.Card
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.currentCompositionLocalContext
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.glance.Button
+import androidx.core.text.isDigitsOnly
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.ImageProvider
-import androidx.glance.action.actionStartActivity
+import androidx.glance.Visibility
 import androidx.glance.action.clickable
+import androidx.glance.appwidget.CircularProgressIndicator
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
+import androidx.glance.appwidget.ProgressIndicatorDefaults
 import androidx.glance.appwidget.components.CircleIconButton
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.lazy.LazyColumn
+import androidx.glance.appwidget.lazy.items
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
 import androidx.glance.layout.Alignment
+import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
+import androidx.glance.layout.fillMaxHeight
+import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
@@ -37,26 +45,69 @@ import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
+import androidx.glance.visibility
 import com.l0mtick.mgkcttimetable.R
+import com.l0mtick.mgkcttimetable.domain.model.schedule.DaySchedule
+import com.l0mtick.mgkcttimetable.domain.model.schedule.Lesson
+import com.l0mtick.mgkcttimetable.domain.model.schedule.ScheduleUnion
+import com.l0mtick.mgkcttimetable.domain.repository.ScheduleRepository
+import org.koin.compose.koinInject
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
-object TimetableWidget: GlanceAppWidget() {
+object TimetableWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        provideContent { 
+        provideContent {
             WidgetContent()
         }
     }
 
     @Composable
-    fun WidgetContent(modifier: Modifier = Modifier, header: String = "Богдановская О.Н.") {
-
-        val context = androidx.glance.LocalContext.current
-        val settingsIntent = createSettingsIntent(context)
-
+    fun WidgetContent(
+        modifier: Modifier = Modifier,
+        scheduleRepository: ScheduleRepository = koinInject()
+    ) {
         val scheduleRowTextStyle = TextStyle(
             color = GlanceTheme.colors.onBackground,
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium
         )
+
+        val context = androidx.glance.LocalContext.current
+        val settingsIntent = createSettingsIntent(context)
+
+        var daySchedule by remember {
+            mutableStateOf(DaySchedule())
+        }
+
+        var header by remember {
+            mutableStateOf("")
+        }
+
+        var isUpdating by remember {
+            mutableStateOf(true)
+        }
+
+        LaunchedEffect(key1 = isUpdating) {
+            if (isUpdating) {
+                Log.e("widget_test", "Start updating")
+                val localDate =
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+                header = scheduleRepository.getSavedGroup() ?: "Unknown"
+                val weekSchedule =
+                    scheduleRepository.parseGroupTimetable(scheduleRepository.getSavedGroup() ?: "")
+                weekSchedule.days?.forEach { day ->
+                    //TODO: remove hardcoded date
+                    if (day.date == "09.07.2024") {
+                        daySchedule = day
+                        isUpdating = false
+                        Log.e("widget_test", daySchedule.toString())
+                    }
+                }
+                isUpdating = false
+            }
+        }
+
 
         Column(
             modifier = GlanceModifier
@@ -69,12 +120,12 @@ object TimetableWidget: GlanceAppWidget() {
                     .fillMaxWidth()
             ) {
                 Text(
-                    text = header,
+                    text = if (header.isDigitsOnly()) "Группа $header" else header,
                     modifier = GlanceModifier
                         .padding(8.dp)
                         .defaultWeight()
                         .clickable {
-                            //TODO: navigate to schedule screen
+                            Log.e("widget_test", header)
                         }
                         .cornerRadius(8.dp),
                     style = TextStyle(
@@ -106,52 +157,146 @@ object TimetableWidget: GlanceAppWidget() {
                     ),
                     contentDescription = "Update button",
                     onClick = {
-                        //TODO
+                        isUpdating = true
                     },
                     contentColor = GlanceTheme.colors.onSecondaryContainer,
                     backgroundColor = GlanceTheme.colors.background,
                     modifier = GlanceModifier
                         .size(36.dp)
                 )
-                
+
             }
-            LazyColumn(
+            Box(
                 modifier = GlanceModifier
-                    .background(GlanceTheme.colors.secondaryContainer)
+                    .fillMaxSize()
                     .cornerRadius(16.dp)
+                    .background(GlanceTheme.colors.secondaryContainer),
+                contentAlignment = Alignment.Center
             ) {
-                repeat(6){
-                    item {
-                        Row(
+                Box(
+                    modifier = GlanceModifier
+                        .visibility(if (!isUpdating) Visibility.Visible else Visibility.Invisible),
+                    ) {
+                    if (daySchedule.lessons.isNullOrEmpty()) {
+                        Text(
+                            text = context.getString(R.string.screen_no_lessons),
+                            style = scheduleRowTextStyle
+                        )
+                    } else {
+                        LazyColumn(
                             modifier = GlanceModifier
-                                .padding(horizontal = 16.dp, vertical = 8.dp)
-                                .fillMaxWidth(),
-                            horizontalAlignment = Alignment.Horizontal.Start
+                                .fillMaxSize()
+                                .background(GlanceTheme.colors.secondaryContainer)
+                                .cornerRadius(16.dp)
                         ) {
-                            Text(
-                                text = "1.",
-                                style = scheduleRowTextStyle
-                            )
-                            Text(
-                                text = "КПИЯП (ЭКЗ)",
-                                modifier = GlanceModifier
-                                    .padding(horizontal = 2.dp)
-                                    .defaultWeight(),
-                                style = scheduleRowTextStyle
-                            )
-                            Text(
-                                text = "3-212",
-                                style = scheduleRowTextStyle
-                            )
+                            if (!daySchedule.lessons.isNullOrEmpty()) {
+                                items(daySchedule.lessons!!) { lesson ->
+                                    if (lesson != null)
+                                        Row(
+                                            modifier = GlanceModifier
+                                                .padding(horizontal = 8.dp, vertical = 8.dp)
+                                                .fillMaxWidth(),
+                                            verticalAlignment = Alignment.Vertical.CenterVertically
+                                        ) {
+                                            when (lesson) {
+                                                is ScheduleUnion.LessonValue -> {
+                                                    Text(
+                                                        text = lesson.value.number.toString() + ".",
+                                                        style = scheduleRowTextStyle,
+                                                        modifier = GlanceModifier
+                                                            .padding(end = 6.dp)
+                                                    )
+                                                    GlanceLessonRow(
+                                                        lesson = lesson.value,
+                                                        scheduleRowTextStyle = scheduleRowTextStyle
+                                                    )
+                                                }
+
+                                                is ScheduleUnion.LessonArrayValue -> {
+                                                    Text(
+                                                        text = lesson.value[0].number.toString() + ".",
+                                                        style = scheduleRowTextStyle,
+                                                        modifier = GlanceModifier
+                                                            .padding(end = 6.dp)
+                                                    )
+                                                    lesson.value.forEach {
+                                                        GlanceLessonRow(
+                                                            lesson = it,
+                                                            scheduleRowTextStyle = scheduleRowTextStyle
+                                                        )
+                                                    }
+                                                }
+                                            }
+
+                                        }
+                                }
+                            }
                         }
                     }
+                }
+                Box(
+                    modifier = GlanceModifier
+                        .background(GlanceTheme.colors.widgetBackground)
+                        .cornerRadius(6.dp)
+                        .size(32.dp)
+                        .visibility(if (isUpdating) Visibility.Visible else Visibility.Invisible),
+
+                ) {
+                    CircularProgressIndicator(
+                        modifier = GlanceModifier
+                            .padding(6.dp),
+                        color = GlanceTheme.colors.onSecondaryContainer
+                    )
                 }
             }
         }
     }
 }
 
-class TimetableWidgetReceiver: GlanceAppWidgetReceiver() {
+class TimetableWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget
         get() = TimetableWidget
+}
+
+@Composable
+fun GlanceLessonRow(lesson: Lesson, scheduleRowTextStyle: TextStyle) {
+    Row(
+        modifier = GlanceModifier.fillMaxWidth(),
+        verticalAlignment = Alignment.Vertical.CenterVertically
+    ) {
+        Text(
+            text = getLessonString(lesson),
+            modifier = GlanceModifier
+                .padding(horizontal = 2.dp)
+                .defaultWeight(),
+            style = scheduleRowTextStyle
+        )
+        Text(
+            text = lesson.cabinet ?: "-",
+            style = scheduleRowTextStyle
+        )
+    }
+}
+
+private fun getLessonString(lesson: Lesson): String {
+    val subgroupString = if (lesson.subgroup != null) {
+        "${lesson.subgroup}. "
+    } else {
+        ""
+    }
+    val teacherString = if (lesson.teacher != null) {
+        "\n${lesson.teacher}"
+    } else {
+        ""
+    }
+    val commentString = if (teacherString == "" && !lesson.comment.isNullOrEmpty())
+        "\n${(lesson.comment)}"
+    else
+        "  ${(lesson.comment ?: "")}"
+    val mainString = subgroupString +
+            lesson.name.toString() +
+            " (${lesson.type ?: ""})" +
+            teacherString +
+            commentString
+    return mainString
 }
