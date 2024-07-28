@@ -1,7 +1,6 @@
 package com.l0mtick.mgkcttimetable.data.repository
 
 import android.Manifest
-import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.content.pm.PackageManager
@@ -13,7 +12,6 @@ import android.net.NetworkRequest
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.firebase.ktx.Firebase
