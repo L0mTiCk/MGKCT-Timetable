@@ -28,21 +28,44 @@ import com.l0mtick.mgkcttimetable.R
 import com.l0mtick.mgkcttimetable.presentation.settings.SettingsEvent
 
 @Composable
-fun AppInfoRowItem(onEvent: (SettingsEvent) -> Unit) {
-    OtherSectionRowBase(
-        onRowClick = {
-            onEvent(SettingsEvent.OnAppInfoClick)
-            Firebase.analytics.logEvent("about_app_pressed") {}
-        },
-        title = stringResource(id = R.string.settings_about_title),
-        subtitle = stringResource(
-            id = R.string.settings_about_main
-        )
+fun OtherSectionRowBase(
+    modifier: Modifier = Modifier,
+    onRowClick: () -> Unit,
+    title: String,
+    subtitle: String,
+    trailingContent: @Composable() () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(10.dp))
+            .clickable {
+                onRowClick()
+            }
+            .padding(5.dp)
     ) {
-        Icon(
-            imageVector = Icons.Outlined.Info,
-            contentDescription = "Info icon",
-            modifier = Modifier.size(25.dp)
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+        ) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                Column {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Text(
+                        text = subtitle,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = .8f)
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.width(15.dp))
+            trailingContent()
+        }
     }
 }

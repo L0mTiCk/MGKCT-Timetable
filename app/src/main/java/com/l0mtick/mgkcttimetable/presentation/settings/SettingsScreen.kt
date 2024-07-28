@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.twotone.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -32,6 +33,7 @@ import com.l0mtick.mgkcttimetable.presentation.settings.components.AppInfoDialog
 import com.l0mtick.mgkcttimetable.presentation.settings.components.other.AppInfoRowItem
 import com.l0mtick.mgkcttimetable.presentation.settings.components.other.NotificationRowItem
 import com.l0mtick.mgkcttimetable.presentation.settings.components.OutlinedSelector
+import com.l0mtick.mgkcttimetable.presentation.settings.components.other.WidgetSettingRowItem
 import org.koin.androidx.compose.getViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -89,40 +91,44 @@ fun SettingsScreen(
             )
         }
     ) {
-        Column(
+        LazyColumn(
             modifier = Modifier
-                .padding(horizontal = 20.dp, vertical = it.calculateTopPadding())
+                .padding(start = 20.dp, end = 20.dp, top = it.calculateTopPadding())
                 .fillMaxSize()
         ) {
-            OutlinedSelector(
-                label = stringResource(id = R.string.navigation_group),
-                value = state.selectedGroup,
-                elements = state.allGroups,
-                onEvent = onGroupEvent
-            )
-            OutlinedSelector(
-                label = stringResource(id = R.string.navigation_teacher),
-                value = state.selectedTeacher,
-                elements = state.allTeachers,
-                onEvent = onTeacherEvent
-            )
-            HorizontalDivider(
-                modifier = Modifier.padding(top = 30.dp)
-            )
-            Column(
-                modifier = Modifier.padding(vertical = 20.dp)
-            ) {
-                Text(
-                    text = stringResource(id = R.string.settings_other),
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer
+            item {
+                OutlinedSelector(
+                    label = stringResource(id = R.string.navigation_group),
+                    value = state.selectedGroup,
+                    elements = state.allGroups,
+                    onEvent = onGroupEvent
                 )
+                OutlinedSelector(
+                    label = stringResource(id = R.string.navigation_teacher),
+                    value = state.selectedTeacher,
+                    elements = state.allTeachers,
+                    onEvent = onTeacherEvent
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(top = 30.dp)
+                )
+                Column(
+                    modifier = Modifier.padding(vertical = 20.dp)
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.settings_other),
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
 //                Spacer(modifier = Modifier.height(10.dp))
 //                ContactDeveloperRowItem()
-                Spacer(modifier = Modifier.height(20.dp))
-                NotificationRowItem(isAllowed = state.isNotificationsEnabled, onEvent = onEvent)
-                Spacer(modifier = Modifier.height(10.dp))
-                AppInfoRowItem(onEvent = onEvent)
+                    Spacer(modifier = Modifier.height(20.dp))
+                    NotificationRowItem(isAllowed = state.isNotificationsEnabled, onEvent = onEvent)
+                    Spacer(modifier = Modifier.height(10.dp))
+                    AppInfoRowItem(onEvent = onEvent)
+                    Spacer(modifier = Modifier.height(10.dp))
+                    WidgetSettingRowItem(state.isWidgetGroupSelected, onEvent = onEvent)
+                }
             }
         }
     }

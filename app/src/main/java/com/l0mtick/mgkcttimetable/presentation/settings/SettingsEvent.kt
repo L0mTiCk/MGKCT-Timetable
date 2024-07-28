@@ -7,4 +7,5 @@ sealed interface SettingsEvent {
     object OnDialogDismiss: SettingsEvent
     object OnDataUpdate: SettingsEvent
     object OnNotificationClick: SettingsEvent
+    data class OnWidgetSelectionChanged(val isGroup: Boolean): SettingsEvent
 }

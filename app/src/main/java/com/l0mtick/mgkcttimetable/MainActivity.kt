@@ -151,7 +151,12 @@ class MainActivity : ComponentActivity() {
                                 ?: "group",
                             modifier = Modifier.padding(it)
                         ) {
-                            composable("group") {
+                            composable(
+                                route = "group",
+                                deepLinks = listOf(navDeepLink {
+                                    uriPattern = "mgkcttimetable://group"
+                                })
+                            ) {
                                 GroupScheduleScreen(
                                     navController = navController,
                                     groupScheduleScreenViewModel = getViewModel<GroupScheduleScreenViewModel>()
@@ -160,7 +165,9 @@ class MainActivity : ComponentActivity() {
 
                             composable(
                                 route = "settings",
-                                deepLinks = listOf(navDeepLink { uriPattern = "mgkcttimetable://settings" })
+                                deepLinks = listOf(navDeepLink {
+                                    uriPattern = "mgkcttimetable://settings"
+                                })
                             ) {
                                 SettingsScreen(
                                     navController = navController,
@@ -168,7 +175,12 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
 
-                            composable("teacher") {
+                            composable(
+                                route = "teacher",
+                                deepLinks = listOf(navDeepLink {
+                                    uriPattern = "mgkcttimetable://teacher"
+                                })
+                            ) {
                                 TeacherScheduleScreen(
                                     navController = navController,
                                     teacherScheduleScreenViewModel = getViewModel<TeacherScheduleScreenViewModel>()

@@ -79,7 +79,13 @@ class TimetableWidget : GlanceAppWidget() {
 
         val context = androidx.glance.LocalContext.current
         val settingsIntent by remember {
-            mutableStateOf(createSettingsIntent(context))
+            mutableStateOf(WidgetIntents.createSettingsIntent(context))
+        }
+        val groupIntent by remember {
+            mutableStateOf(WidgetIntents.createGroupIntent(context))
+        }
+        val teacherIntent by remember {
+            mutableStateOf(WidgetIntents.createTeacherIntent(context))
         }
 
         var daySchedule by remember {
@@ -98,9 +104,9 @@ class TimetableWidget : GlanceAppWidget() {
             if (isUpdating) {
                 val localDate =
                     LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
-                header = scheduleRepository.getSavedGroup() ?: "Unknown"
+                header = scheduleRepository.getWidgetHeader()
                 val weekSchedule =
-                    scheduleRepository.parseGroupTimetable(scheduleRepository.getSavedGroup() ?: "")
+                    scheduleRepository.parseWidgetTimetable()
                 weekSchedule.days?.forEach { day ->
                     //TODO: remove hardcoded date
                     if (day.date == "09.07.2024") {
@@ -124,19 +130,23 @@ class TimetableWidget : GlanceAppWidget() {
                     .fillMaxWidth()
             ) {
                 Text(
-                    text = if (header.isDigitsOnly()) "Группа $header" else header,
+                    text = if (header.isNotEmpty() && header.isDigitsOnly()) "Группа $header" else header,
                     modifier = GlanceModifier
                         .padding(8.dp)
                         .defaultWeight()
                         .clickable {
-                            //TODO: nav to screen with schedule
+                            if (scheduleRepository.isWidgetGroupSelected())
+                                groupIntent.send()
+                            else
+                                teacherIntent.send()
                         }
                         .cornerRadius(8.dp),
                     style = TextStyle(
                         color = GlanceTheme.colors.onBackground,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
-                    )
+                    ),
+                    maxLines = 1
                 )
                 CircleIconButton(
                     imageProvider = ImageProvider(

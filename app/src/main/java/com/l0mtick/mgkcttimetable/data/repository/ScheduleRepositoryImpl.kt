@@ -282,4 +282,27 @@ class ScheduleRepositoryImpl(
             }
         }
     }
+
+    override suspend fun saveWidgetSelection(isGroup: Boolean) {
+        sharedPreferences.edit().putBoolean(Constants.WIDGET_IS_GROUP_SELECTED, isGroup).apply()
+    }
+
+    override fun isWidgetGroupSelected(): Boolean {
+        return sharedPreferences.getBoolean(Constants.WIDGET_IS_GROUP_SELECTED, true)
+    }
+
+    override suspend fun parseWidgetTimetable(): WeekSchedule {
+        if (isWidgetGroupSelected()) {
+            return parseGroupTimetable(getSavedGroup() ?: "")
+        } else {
+            return parseTeacherTimetable(getSavedTeacher() ?: "")
+        }
+    }
+
+    override suspend fun getWidgetHeader(): String {
+        if (isWidgetGroupSelected())
+            return getSavedGroup() ?: application.getString(R.string.screen_no_group)
+        else
+            return getSavedTeacher() ?: application.getString(R.string.screen_no_group)
+    }
 }

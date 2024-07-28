@@ -21,4 +21,8 @@
     <string name="screen_updated">Обновлено</string>
     <string name="screen_changed">Изменено</string>
     <string name="widget_description">Виджет показывающий расписание на сегодня</string>
+    <string name="settings_contact_title">Связь с разработчиком</string>
+    <string name="settings_contact_main">Отправить вопрос разработчику</string>
+    <string name="settings_widget_title">Настройка виджета</string>
+    <string name="settings_widget_main">Выбор расписания для виджета</string>
 </resources>
