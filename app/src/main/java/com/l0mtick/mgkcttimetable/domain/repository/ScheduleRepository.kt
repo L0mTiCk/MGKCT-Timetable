@@ -41,4 +41,12 @@ interface ScheduleRepository {
     fun getEmptySelectedString(): String
 
     fun getCurrentLesson(): Int
+
+    suspend fun saveWidgetSelection(isGroup: Boolean)
+
+    fun isWidgetGroupSelected(): Boolean
+
+    suspend fun parseWidgetTimetable(): WeekSchedule
+
+    suspend fun getWidgetHeader(): String
 }

@@ -19,7 +19,8 @@ class SettingsScreenViewModel(private val scheduleRepository: ScheduleRepository
         SettingsState(
             selectedGroup = scheduleRepository.getSavedGroup() ?: "",
             selectedTeacher = scheduleRepository.getSavedTeacher() ?: "",
-            isNotificationsEnabled = scheduleRepository.getNotificationPermissionStatus()
+            isNotificationsEnabled = scheduleRepository.getNotificationPermissionStatus(),
+            isWidgetGroupSelected = scheduleRepository.isWidgetGroupSelected()
         )
     )
 
@@ -109,6 +110,17 @@ class SettingsScreenViewModel(private val scheduleRepository: ScheduleRepository
                                 )
                             )
                         }
+                    }
+                }
+            }
+
+            is SettingsEvent.OnWidgetSelectionChanged -> {
+                viewModelScope.launch {
+                    scheduleRepository.saveWidgetSelection(event.isGroup)
+                    _state.update {
+                        it.copy(
+                            isWidgetGroupSelected = event.isGroup
+                        )
                     }
                 }
             }
