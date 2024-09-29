@@ -109,7 +109,7 @@ class TimetableWidget : GlanceAppWidget() {
                     scheduleRepository.parseWidgetTimetable()
                 weekSchedule.days?.forEach { day ->
                     //TODO: remove hardcoded date
-                    if (day.date == "09.07.2024") {
+                    if (day.date == localDate) {
                         daySchedule = day
                         isUpdating = false
                         Log.d("widget_test", daySchedule.toString())
@@ -199,7 +199,7 @@ class TimetableWidget : GlanceAppWidget() {
                     } else {
                         LazyColumn(
                             modifier = GlanceModifier
-                                .fillMaxSize()
+                                .fillMaxWidth()
                                 .background(GlanceTheme.colors.secondaryContainer)
                                 .cornerRadius(16.dp)
                         ) {
@@ -233,11 +233,13 @@ class TimetableWidget : GlanceAppWidget() {
                                                         modifier = GlanceModifier
                                                             .padding(end = 6.dp)
                                                     )
-                                                    lesson.value.forEach {
-                                                        GlanceLessonRow(
-                                                            lesson = it,
-                                                            scheduleRowTextStyle = scheduleRowTextStyle
-                                                        )
+                                                    Column {
+                                                        lesson.value.forEach {
+                                                            GlanceLessonRow(
+                                                                lesson = it,
+                                                                scheduleRowTextStyle = scheduleRowTextStyle
+                                                            )
+                                                        }
                                                     }
                                                 }
                                             }
