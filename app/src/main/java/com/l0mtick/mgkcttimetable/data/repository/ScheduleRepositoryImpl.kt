@@ -1,7 +1,6 @@
 package com.l0mtick.mgkcttimetable.data.repository
 
 import android.Manifest
-import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.content.pm.PackageManager
@@ -13,7 +12,6 @@ import android.net.NetworkRequest
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.firebase.ktx.Firebase
@@ -283,5 +281,28 @@ class ScheduleRepositoryImpl(
                 }
             }
         }
+    }
+
+    override suspend fun saveWidgetSelection(isGroup: Boolean) {
+        sharedPreferences.edit().putBoolean(Constants.WIDGET_IS_GROUP_SELECTED, isGroup).apply()
+    }
+
+    override fun isWidgetGroupSelected(): Boolean {
+        return sharedPreferences.getBoolean(Constants.WIDGET_IS_GROUP_SELECTED, true)
+    }
+
+    override suspend fun parseWidgetTimetable(): WeekSchedule {
+        if (isWidgetGroupSelected()) {
+            return parseGroupTimetable(getSavedGroup() ?: "")
+        } else {
+            return parseTeacherTimetable(getSavedTeacher() ?: "")
+        }
+    }
+
+    override suspend fun getWidgetHeader(): String {
+        if (isWidgetGroupSelected())
+            return getSavedGroup() ?: application.getString(R.string.screen_no_group)
+        else
+            return getSavedTeacher() ?: application.getString(R.string.screen_no_group)
     }
 }

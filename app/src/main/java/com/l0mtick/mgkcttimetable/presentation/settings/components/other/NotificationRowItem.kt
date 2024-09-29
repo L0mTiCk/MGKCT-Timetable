@@ -27,43 +27,17 @@ fun NotificationRowItem(
     isAllowed: Boolean,
     onEvent: (SettingsEvent) -> Unit
 ) {
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(10.dp))
-            .clickable {
-
-            }
-            .padding(5.dp)
+    OtherSectionRowBase(
+        onRowClick = {  },
+        title = stringResource(id = R.string.settings_notification_title),
+        subtitle = stringResource(id = R.string.settings_notification_main)
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-        ) {
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-            ) {
-                Column {
-                    Text(
-                        text = stringResource(id = R.string.settings_notification_title),
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Spacer(modifier = Modifier.height(5.dp))
-                    Text(
-                        text = stringResource(id = R.string.settings_notification_main),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = .9f)
-                    )
-                }
+        Switch(
+            modifier = Modifier.scale(.8f),
+            checked = isAllowed,
+            onCheckedChange = {
+                onEvent(SettingsEvent.OnNotificationClick)
             }
-            Spacer(modifier = Modifier.width(15.dp))
-            Switch(
-                modifier = Modifier.scale(.8f),
-                checked = isAllowed,
-                onCheckedChange = {
-                    onEvent(SettingsEvent.OnNotificationClick)
-                }
-            )
-        }
+        )
     }
 }

@@ -19,4 +19,9 @@
     <string name="toast_notifications">Grant permission in the settings</string>
     <string name="screen_updated">Updated</string>
     <string name="screen_changed">Changed</string>
+    <string name="widget_description">Widget that shows timetable for today</string>
+    <string name="settings_contact_title">Contact developer</string>
+    <string name="settings_contact_main">Send your question to dev</string>
+    <string name="settings_widget_title">Widget setting</string>
+    <string name="settings_widget_main">Widget schedule selection</string>
 </resources>

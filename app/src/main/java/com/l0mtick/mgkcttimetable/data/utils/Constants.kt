@@ -10,6 +10,7 @@ object Constants {
     const val SAVE_ROUTE = "saved_route"
     const val IS_FIRST_LAUNCH = "is_first_launch"
     const val ARE_NOTIFICATIONS_ENABLED = "are_notifications_enabled"
+    const val WIDGET_IS_GROUP_SELECTED = "widget_is_group_selected"
 
     //firebase topics
     const val SCHEDULE_UPDATE = "schedule_update"

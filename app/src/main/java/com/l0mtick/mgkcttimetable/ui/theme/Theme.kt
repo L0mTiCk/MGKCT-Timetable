@@ -5,10 +5,10 @@ import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarDefaults
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import androidx.glance.material3.ColorProviders
 
 
 private val LightColors = lightColorScheme(
@@ -85,8 +86,8 @@ private val DarkColors = darkColorScheme(
 
 @Composable
 fun MGKCTTimetableTheme(
-  useDarkTheme: Boolean = isSystemInDarkTheme(),
-  content: @Composable() () -> Unit
+    useDarkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable() () -> Unit
 ) {
     val colors = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         val context = LocalContext.current
@@ -96,11 +97,12 @@ fun MGKCTTimetableTheme(
     }
 
     val view = LocalView.current
-    if(!view.isInEditMode) {
+    if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = colors.surface.toArgb()
-            window.navigationBarColor = colors.surfaceColorAtElevation(NavigationBarDefaults.Elevation).toArgb()
+            window.navigationBarColor =
+                colors.surfaceColorAtElevation(NavigationBarDefaults.Elevation).toArgb()
             WindowCompat.getInsetsController(
                 window,
                 view
@@ -116,4 +118,8 @@ fun MGKCTTimetableTheme(
         typography = Typography,
         content = content
     )
+}
+
+object GlanceCustomTheme {
+    val colors = ColorProviders(light = LightColors, dark = DarkColors)
 }

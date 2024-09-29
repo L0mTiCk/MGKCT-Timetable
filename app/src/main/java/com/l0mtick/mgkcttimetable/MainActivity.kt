@@ -35,6 +35,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navDeepLink
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
@@ -150,21 +151,36 @@ class MainActivity : ComponentActivity() {
                                 ?: "group",
                             modifier = Modifier.padding(it)
                         ) {
-                            composable("group") {
+                            composable(
+                                route = "group",
+                                deepLinks = listOf(navDeepLink {
+                                    uriPattern = "mgkcttimetable://group"
+                                })
+                            ) {
                                 GroupScheduleScreen(
                                     navController = navController,
                                     groupScheduleScreenViewModel = getViewModel<GroupScheduleScreenViewModel>()
                                 )
                             }
 
-                            composable("settings") {
+                            composable(
+                                route = "settings",
+                                deepLinks = listOf(navDeepLink {
+                                    uriPattern = "mgkcttimetable://settings"
+                                })
+                            ) {
                                 SettingsScreen(
                                     navController = navController,
                                     settingsScreenViewModel = getViewModel<SettingsScreenViewModel>()
                                 )
                             }
 
-                            composable("teacher") {
+                            composable(
+                                route = "teacher",
+                                deepLinks = listOf(navDeepLink {
+                                    uriPattern = "mgkcttimetable://teacher"
+                                })
+                            ) {
                                 TeacherScheduleScreen(
                                     navController = navController,
                                     teacherScheduleScreenViewModel = getViewModel<TeacherScheduleScreenViewModel>()

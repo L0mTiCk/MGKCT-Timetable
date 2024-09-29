@@ -96,7 +96,6 @@ fun ScheduleDayCard(
                             Row(
                                 modifier = Modifier
                                     .background(
-                                        //TODO: return color highlighting for current lesson
                                         color = if (daySchedule.date == LocalDateTime.now().format(
                                                 DateTimeFormatter.ofPattern("dd.MM.yyyy"))
                                             && getLessonNumber(scheduleUnion) == state.currentLesson)

@@ -8,4 +8,5 @@ data class SettingsState (
     val isGroupMenuExpanded: Boolean = false,
     val isAppInfoDialogOpen: Boolean = false,
     val isNotificationsEnabled: Boolean,
+    val isWidgetGroupSelected: Boolean = true
 )
